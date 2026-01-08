@@ -1,22 +1,28 @@
-import Header from './Header';
-import Table from './Table';
-import Tableinfo from './Tableinfo';
-import Footer from './Footer';
+import React, { useRef } from 'react'
+import Header from './Header'
+import Table from './Table'
+import Tableinfo from './Tableinfo'
+import Footer from './Footer'
+import Download from './Download'
+import './Bfrom.css'
 
+const Bfrom = () => {
+  const bformRef = useRef(null)
 
+  return (
+    <>
+      {/* PDF BUTTONS */}
+      <Download targetRef={bformRef} />
 
-const Bfrom=()=>{
-    return(
-        <>
-        <div className="b-from min-h-screen px-8 py-6 flex flex-col items-center">  
-            <div className="w-full max-w-5xl px-8 space-y-6">    
-            <Header />
-            <Table />
-            <Tableinfo />   
-            <Footer />
-            </div>
-        </div>
-        </>
-    )
+      {/* PDF CONTENT */}
+      <div ref={bformRef} className="pdf-wrapper">
+        <Header />
+        <Table />
+        <Tableinfo />
+        <Footer />
+      </div>
+    </>
+  )
 }
-export default Bfrom;
+
+export default Bfrom

@@ -8,7 +8,7 @@ const Header=()=>{
                    
                 </div>
                 <div className="header-info">
-                    <h1 className="text-center  m-20 text-3xl font-medium decoration-solid ">B-Form(Faculty/Invigilator Copy)</h1>
+                    <h2 className="text-center  m-20 text-3xl font-medium decoration-solid ">B-Form(Faculty/Invigilator Copy)</h2>
                     <Examdetails />
                     
 

@@ -1,0 +1,112 @@
+/* ===============================
+   A4 PAGE
+   =============================== */
+.pdf-wrapper {
+  width: 210mm;
+  height: 297mm;
+  padding: 10mm;
+  margin: 0 auto;
+  background: white;
+  color: black;
+  font-size: 11px;
+  overflow: hidden;
+}
+
+.pdf-wrapper,
+.pdf-wrapper * {
+  box-sizing: border-box;   /* 🔴 critical */
+}
+
+/* ===============================
+   HEADER
+   =============================== */
+.pdf-wrapper h1,
+.pdf-wrapper h2 {
+  font-size: 15px;
+  margin: 2mm 0 3mm 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.pdf-wrapper p,
+.pdf-wrapper span,
+.pdf-wrapper label {
+  font-size: 11px;
+  line-height: 1.25;
+  margin: 0.8mm 0;
+}
+
+/* ===============================
+   TABLE (FIXED WIDTH, NO OVERFLOW)
+   =============================== */
+.pdf-wrapper table {
+  width: 100%;
+  border-spacing: 0;
+  border: 1px solid black;
+  table-layout: fixed;      /* 🔴 mandatory */
+}
+
+/* Column widths (must total 100%) */
+.pdf-wrapper th:nth-child(1),
+.pdf-wrapper td:nth-child(1) { width: 8%; }   /* SL No */
+
+.pdf-wrapper th:nth-child(2),
+.pdf-wrapper td:nth-child(2) { width: 20%; }  /* USN */
+
+.pdf-wrapper th:nth-child(3),
+.pdf-wrapper td:nth-child(3) { width: 32%; }  /* Name */
+
+.pdf-wrapper th:nth-child(4),
+.pdf-wrapper td:nth-child(4) { width: 15%; }  /* Seat No */
+
+.pdf-wrapper th:nth-child(5),
+.pdf-wrapper td:nth-child(5) { width: 25%; }  /* Signature */
+
+/* Header cells */
+.pdf-wrapper th {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 3px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Body cells */
+.pdf-wrapper td {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 3px 4px;
+  font-size: 10.5px;
+  text-align: center;
+  vertical-align: middle;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Remove extra right border */
+.pdf-wrapper th:last-child,
+.pdf-wrapper td:last-child {
+  border-right: none;
+}
+
+/* Prevent row split */
+.pdf-wrapper tr {
+  page-break-inside: avoid;
+}
+
+/* ===============================
+   FOOTER / INFO
+   =============================== */
+.table-info,
+.footer {
+  margin-top: 4mm;
+}
+
+.table-info p,
+.footer p {
+  font-size: 11px;
+  margin: 1mm 0;
+}
