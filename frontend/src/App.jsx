@@ -1,5 +1,5 @@
 
-import Bfrom from './components/Bfrom.jsx';
+import Bfrom from './components/B-from/Bfrom';
 function App() {
   
 
