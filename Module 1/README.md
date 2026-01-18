@@ -1,12 +1,11 @@
-# Timetable Generation System - Frontend
+# Timetable Generation System
 
-A React-based frontend application for managing and generating examination timetables.
+A full-stack application for managing and generating examination timetables.
 
 ## Dashboard Preview
 
 ### Light Mode
 ![Dashboard Light Mode](./frontend/images/dashboard.png)
-*(Images are located in `frontend/images` directory)*
 
 ### Dark Mode
 ![Dashboard Dark Mode](./frontend/images/dashboard-dark.png)
@@ -29,33 +28,60 @@ A React-based frontend application for managing and generating examination timet
 
 ## Features
 
-Based on the dashboard interface:
+Key capabilities of the system:
 
-*   **Coordinator Dashboard**: Central hub to manage curriculum and exams.
-*   **Workflow Tracking**: Visual progress tracker for the scheduling process:
-    1.  **Subjects**: Manage course subjects.
-    2.  **Create Draft**: Generate initial timetable drafts.
-    3.  **Publish**: Finalize and publish schedules.
-*   **Quick Stats**: Instant view of:
-    *   Total Subjects
-    *   Exams Scheduled
-    *   Drafts in progress
-    *   Published schedules
-*   **Quick Actions**:
-    *   Schedule Exam
-    *   View Timetables
-    *   Settings
-*   **Insights & Activity**: Track recent scheduling activities and semester progress.
-*   **System Status**: Real-time indicators for Backend and DB connection status.
+*   **Simple Dashboard**: A main control panel to manage everything in one place.
+*   **Step-by-Step Workflow**: Easy-to-follow process for scheduling:
+    1.  **Subjects**: Add and organize your subjects.
+    2.  **Draft**: Generate and refine exam schedules.
+    3.  **Publish**: Share the final timetable.
+*   **At-a-Glance Stats**: Quickly see:
+    *   How many subjects you have.
+    *   Number of exams scheduled.
+    *   Drafts you are working on.
+    *   Timetables that are live.
+*   **Fast Actions**: Shortcuts to:
+    *   Schedule a new exam.
+    *   See existing timetables.
+    *   Change settings.
+*   **Recent Activity**: Keep track of the latest updates and changes.
+*   **System Health**: Instantly check if the server and database are connected.
+*   **Database**: Uses MongoDB for reliable data storage.
+
+## Tech Stack
+
+*   **Frontend**: React 19, TypeScript, Vite
+*   **Backend**: Java 21, Spring Boot 3
+*   **Database**: MongoDB (running on Docker)
+*   **Key Tools**: Maven, jsPDF (for PDFs), SheetJS (for Excel), EmailJS
 
 ## Getting Started
 
-1.  Install dependencies:
+### Prerequisites
+
+*   Node.js (for Frontend)
+*   Java 21 (for Backend)
+*   Docker (for Database)
+
+### Installation & Running
+
+1.  **Database**:
+    Start MongoDB using Docker:
     ```bash
-    npm install
+    docker-compose up -d
     ```
 
-2.  Run the development server:
+2.  **Backend**:
+    Navigate to the backend folder and run the application:
     ```bash
+    cd backend
+    ./mvnw spring-boot:run
+    ```
+
+3.  **Frontend**:
+    Navigate to the frontend folder, install dependencies, and start the server:
+    ```bash
+    cd frontend
+    npm install
     npm run dev
     ```
