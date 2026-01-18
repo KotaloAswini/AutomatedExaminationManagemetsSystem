@@ -1,0 +1,127 @@
+.developers-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    height: 90vh;
+    width: 90%;
+    position: relative;
+    left: 5%;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+.developer {
+    background: var(--containerColor);
+    border-radius: 10px;
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+    color: var(--textColor);
+}
+
+.profile-picture-container {
+    width: 100%;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-pic {
+    border-radius: 20px;
+    width: 250px;
+}
+
+.heading.role {
+    font-size: 25px;
+    font-weight: bold;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-links {
+    display: flex;
+    gap: 0.3rem;
+    justify-content: start;
+    align-items: center;
+}
+
+.contact-links .contact-link {
+    width: 30px;
+}
+
+.developer-details-container {
+    display: grid;
+    gap: 10px;
+}
+
+.developer-details-container .basic-details .field {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: 7px;
+    font-size: 20px;
+}
+
+.developer-details-container .basic-details .field.email .value {
+    font-size: 18px;
+}
+
+.developer-details-container .basic-details .value,
+.developer-details-container .basic-details .value a {
+    color: var(--accentColor);
+}
+
+.contact-details-container .heading {
+    font-size: 19px;
+}
+
+@media (max-width: 1120px) {
+    .developer-details-container .basic-details .field {
+        font-size: 16px;
+    }
+
+    .developer-details-container .basic-details .field.email .value {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 940px) {
+    .developers-container {
+        grid-template-columns: none;
+        grid-auto-flow: row;
+        overflow-y: scroll;
+    }
+}
+
+/* Dark Mode for Contact Us Page */
+body.dark .developers-container {
+    background: #0f172a;
+}
+
+body.dark .developer {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+body.dark .heading.role {
+    color: #f1f5f9;
+}
+
+body.dark .contact-details-container .heading {
+    color: #f1f5f9;
+}
+
+body.dark .developer-details-container .basic-details .value,
+body.dark .developer-details-container .basic-details .value a {
+    color: #60a5fa;
+}
+
+body.dark .contact-links a svg {
+    fill: #cbd5e1;
+}
