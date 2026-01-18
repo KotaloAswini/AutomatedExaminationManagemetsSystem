@@ -1,0 +1,593 @@
+/* Subjects Page - Vertical Stack Layout (Horizontal Form) */
+.page.subjects {
+    height: 90vh;
+    overflow: hidden;
+    padding: 1rem;
+    /* Reduced padding */
+    max-width: 100%;
+    /* Full Width */
+    margin: 0;
+    background-color: #f1f5f9;
+}
+
+.top-sub-container {
+    display: flex;
+    flex-direction: column;
+    /* Stack Form and List vertically */
+    gap: 1.5rem;
+    height: 100%;
+}
+
+/* Search Section */
+.search-section {
+    width: 85%;
+    margin: 0 auto 1rem auto;
+    display: flex;
+    justify-content: flex-end;
+    order: -2;
+    /* Place above the form */
+}
+
+/* === Left Side: Subject List === */
+.left-sub-container {
+    flex: 1;
+    /* Fill remaining space */
+    overflow: hidden;
+    /* Prevent container itself from scrolling */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+    min-height: 0;
+    /* Crucial for flex nested scrolling */
+}
+
+/* Wrapper to constrain the cards grid */
+.cards-wrapper-scroll {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Search Bar Area */
+.tools-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    /* Don't shrink search bar */
+}
+
+/* Cards Grid */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    overflow-y: auto;
+    /* SCROLL HERE */
+    padding-bottom: 2rem;
+    padding-right: 0.5rem;
+    height: 100%;
+    /* Fill wrapper */
+    align-content: start;
+    /* Keep items at top */
+}
+
+/* Subject Card Styling */
+.subject-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    aspect-ratio: 1/1;
+    /* Square cards */
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Dark Mode for Subjects Page */
+body.dark .page.subjects {
+    background-color: #0f172a;
+}
+
+body.dark .tools-container {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+body.dark .subject-card {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #475569;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .subject-card:hover {
+    background: #334155;
+    border-color: #60a5fa;
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+}
+
+.subject-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--edu-blue);
+}
+
+.subject-card.active-card {
+    border-color: var(--edu-blue);
+    background: #eff6ff;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.subject-card strong {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--edu-dark);
+}
+
+/* Add New Card */
+/* Add New Card - Horizontal Banner Style */
+/* Add New Card - Horizontal Banner Style - Redesigned */
+/* Add New Card - Horizontal Banner Style - Redesigned */
+.subject-card.add-new {
+    grid-column: 1 / -1;
+    aspect-ratio: unset;
+    height: auto;
+    min-height: 56px;
+    /* Reduced specific height for thinner look */
+    width: 85%;
+
+    /* Modern Gradient Style */
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: none;
+    border-radius: 12px;
+    /* Slightly tighter radius */
+
+    color: var(--edu-blue);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    /* Slightly tighter gap */
+
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    margin: 0 auto 1rem auto;
+
+    /* Subtle Shadow */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover Effect - Simplified (Removed Gradient Overlay) */
+.subject-card.add-new:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
+    /* color: white; <-- Removed to keep text blue */
+}
+
+/* Content z-index fix */
+.subject-card.add-new svg,
+.subject-card.add-new::after {
+    position: relative;
+    z-index: 1;
+}
+
+.subject-card.add-new svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 3px;
+    transition: transform 0.3s ease;
+}
+
+.subject-card.add-new:hover svg {
+    transform: rotate(90deg) scale(1.1);
+}
+
+.subject-card.add-new::after {
+    content: 'Add New Subject';
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Dark Mode Overrides for Button */
+body.dark .subject-card.add-new {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    /* Dark Gradient */
+    color: #60a5fa;
+    /* Lighter Blue text */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Subtle border */
+}
+
+body.dark .subject-card.add-new:hover {
+    /* color: white; <-- Removed */
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* === Form Section (Horizontal Bar at Top) === */
+.details-container {
+    order: -1;
+    /* Move to Top */
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 3rem;
+    /* BIGGER Padding */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    width: 85%;
+    /* Reduced to 85% */
+    margin: 0 auto;
+    /* Center the form */
+    height: auto;
+    flex-shrink: 0;
+    /* Verify form doesn't shrink */
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    /* Wider columns */
+    gap: 2rem;
+    /* More spacing */
+    align-items: end;
+    /* Align bottoms of inputs */
+    border: none;
+}
+
+/* Header Integration */
+.inputs-container-heading {
+    grid-column: 1 / -1;
+    /* Full width header inside form */
+    font-size: 1.5rem;
+    /* BIGGER Header */
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    text-align: left;
+    /* Left align for horizontal bar */
+    background: none;
+    /* Remove block background */
+    -webkit-text-fill-color: #1e293b;
+    padding: 0;
+    border: none;
+}
+
+/* Grid Spans */
+.col-span-2 {
+    grid-column: span 1;
+}
+
+/* Reset to auto in this layout usually, or manage specifically */
+@media (min-width: 1024px) {
+    .col-span-2 {
+        grid-column: span 2;
+    }
+
+    /* Keep wider inputs wide on large screens */
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    /* Spaced out labels */
+}
+
+.input-box-heading {
+    font-size: 0.9rem;
+    /* BIGGER Label */
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 2px;
+}
+
+.input-box {
+    padding: 1rem 1.5rem;
+    /* Increased padding inside box */
+    border: none;
+    /* Remove the Horizontal Line */
+    border-radius: 12px;
+    /* Rounded Box */
+    font-size: 1.1rem;
+    background: #f1f5f9;
+    /* Filled Background */
+    color: #0f172a;
+    transition: all 0.2s ease;
+}
+
+.input-box:focus {
+    outline: none;
+    background: #e2e8f0;
+    /* Darker on focus */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    /* Focus Ring instead of line */
+}
+
+.input-box::placeholder {
+    color: #94a3b8;
+}
+
+/* Toggle Switches */
+/* Toggle Switches - Redesigned as Rounded Pills */
+/* Toggle Switches - Segmented Control Pill */
+.box {
+    display: flex;
+    background: white;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    /* Visible Border */
+    width: 100%;
+    margin-top: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: default;
+    gap: 0;
+}
+
+.option {
+    flex: 1;
+    text-align: center;
+    padding: 0.6rem 0;
+    /* Fit text properly */
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 999px;
+    /* Inner Pills */
+    color: var(--edu-blue);
+    /* Inactive text is blue */
+    background: transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.option:hover:not(.active) {
+    background: #f1f5f9;
+}
+
+.option.active {
+    background: var(--edu-blue);
+    color: white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    font-weight: 700;
+    transform: none;
+    /* No movement, just color change */
+}
+
+.option.active:hover {
+    background: var(--edu-blue);
+    opacity: 1;
+}
+
+/* Checkbox Group Styles */
+.checkbox-group {
+    display: flex;
+    gap: 2rem;
+    padding: 0.5rem 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.checkbox-label input[type="checkbox"],
+.checkbox-label input[type="radio"] {
+    -webkit-appearance: auto;
+    appearance: auto;
+    width: 22px;
+    height: 22px;
+    accent-color: var(--edu-blue);
+    cursor: pointer;
+    margin: 0;
+}
+
+body.dark .checkbox-label {
+    color: var(--textColor);
+}
+
+
+/* Save Button area - Full Width at Bottom */
+.save-btn-container {
+    grid-column: span 1;
+    /* Take one slot */
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: end;
+}
+
+.subject-save-btn {
+    width: 100%;
+    padding: 1.25rem;
+    /* BIGGER Button */
+    background: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    /* BIGGER Text */
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    white-space: nowrap;
+    /* Prevent text wrap */
+}
+
+.subject-save-btn:hover:not(:disabled) {
+    background: var(--edu-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+}
+
+.subject-delete-btn {
+    flex: 1;
+    background: white;
+    color: #ef4444;
+    border: 2px solid #fee2e2;
+    padding: 1rem;
+    border-radius: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.subject-delete-btn:hover {
+    border-color: #ef4444;
+    background: #fff1f2;
+}
+
+.subject.close-btn {
+    display: none;
+}
+
+/* Custom Range Slider */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    margin: 10px 0;
+    background: transparent;
+}
+
+input[type="range"]:focus {
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    background: #e2e8f0;
+    border-radius: 99px;
+    border: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid white;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: var(--edu-blue);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -8px;
+    /* Centers thumb on track */
+    transition: transform 0.2s;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+    transform: scale(1.1);
+}
+
+/* Dark Mode */
+body.dark .page.subjects {
+    background-color: var(--background);
+}
+
+body.dark .tools-container,
+body.dark .subject-card {
+    background: var(--containerColor);
+    border-color: var(--borderColor);
+    color: var(--textColor);
+}
+
+body.dark .subject-card.add-new {
+    border-color: var(--borderColor);
+    background: var(--containerColor);
+    color: var(--textColor2);
+}
+
+body.dark .subject-card.add-new:hover {
+    border-color: var(--edu-blue);
+    background: var(--containerColor);
+    color: var(--edu-blue);
+}
+
+body.dark .details-container {
+    background: var(--containerColor);
+    color: var(--textColor);
+}
+
+body.dark .inputs-container-heading {
+    color: var(--textColor);
+    -webkit-text-fill-color: var(--textColor);
+}
+
+/* Fix Input Boxes in Dark Mode */
+body.dark .input-box {
+    background: var(--inputBg);
+    /* Use global input background */
+    color: var(--textColor);
+    border: 1px solid var(--borderColor);
+    /* Add border for visibility */
+}
+
+body.dark .input-box:focus {
+    border-color: var(--edu-blue);
+    background: var(--inputBg);
+}
+
+body.dark .input-box-heading {
+    color: var(--textColor2);
+    /* Ensure headers are visible */
+}
+
+body.dark .box {
+    background: var(--containerColor);
+    border-color: var(--borderColor);
+}
+
+body.dark .option {
+    color: var(--textColor2);
+}
+
+body.dark .option.active {
+    background: var(--edu-blue);
+    color: white;
+}
+
+body.dark .subject-save-btn {
+    background: var(--edu-blue);
+    color: white;
+}
+
+body.dark .subject-delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+}
+
+body.dark .subject-delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}

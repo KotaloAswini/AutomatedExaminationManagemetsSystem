@@ -1,0 +1,150 @@
+.cards-container {
+    width: 100%;
+    height: 100%;
+    max-height: 87vh;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(6rem, 0.2fr));
+    overflow-y: scroll;
+    gap: 1.5rem;
+    justify-content: stretch;
+    align-content: start;
+    padding: 15px 10px;
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+.card.data {
+    word-break: break-all;
+    text-align: center;
+}
+
+.card {
+    background: var(--containerColor);
+    height: 130px;
+    border-radius: 10px;
+    box-shadow:
+        0 0 0px 2px var(--borderColor);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s;
+    cursor: pointer;
+    padding: 0 1rem;
+    color: var(--textColor);
+}
+
+.card:hover {
+    background: var(--hoverColor, var(--borderColor));
+}
+
+body.dark .card {
+    background: #1e293b;
+    color: #f1f5f9;
+    box-shadow: 0 0 0px 2px #475569;
+}
+
+body.dark .card:hover {
+    background: #334155;
+    box-shadow: 0 0 0px 2px #60a5fa;
+}
+
+.card.active {
+    box-shadow: 0 0 0px 3px var(--containerColor),
+        0 0 0px 6px var(--accentColor);
+}
+
+.card-wrapper {
+    position: relative;
+}
+
+.card-wrapper .edit-btn {
+    position: absolute;
+    float: right;
+    width: 20px;
+    height: 20px;
+    background: #deedff;
+    z-index: 2;
+    right: 5px;
+    top: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-wrapper .edit-btn svg {
+    width: 10px;
+    height: 10px;
+}
+
+
+.horizental-cards-container {
+    display: grid;
+    grid-template-columns: 40px auto 40px;
+    gap: 15px;
+    justify-content: stretch;
+    align-items: center;
+}
+
+.sub-horizental-cards-container {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 10px;
+    height: calc(100% - 6px);
+    padding: 6px;
+    overflow-x: scroll;
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+    margin-top: auto;
+}
+
+.sub-horizental-cards-container .card {
+    height: 100%;
+    min-width: 4.5rem;
+}
+
+.arrow-for-scroll {
+    width: 25px;
+    height: 25px;
+    background: var(--borderColor);
+}
+
+body.dark .arrow-for-scroll {
+    background: #475569;
+    fill: #f1f5f9;
+}
+
+body.dark .card-wrapper .edit-btn {
+    background: #334155;
+}
+
+body.dark .card-wrapper .edit-btn svg {
+    fill: #60a5fa;
+    fill: var(--textColor);
+    border-radius: 20px;
+    padding: 8px;
+    /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
+    cursor: pointer;
+}
+
+.left-arrow-for-scroll {
+    transform: rotate(180deg);
+}
+
+@media (max-width: 1170px) {
+    .cards-container {
+        height: 85px;
+    }
+}
+
+@media (max-width: 680px) {
+    .cards-container {
+        gap: 15px;
+    }
+
+    .card {
+        height: 7rem;
+    }
+}
