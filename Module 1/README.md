@@ -35,10 +35,6 @@ A full-stack application for managing and generating examination timetables. Par
 - Recent activity tracking
 - System health monitoring (server & database status)
 
-### Export Options
-- **PDF Export**: Generate print-ready timetables using jsPDF
-- **Excel Export**: Export data to spreadsheets using SheetJS
-- **Email Notifications**: Send timetables via EmailJS
 
 ## 🛠️ Tech Stack
 
@@ -50,29 +46,6 @@ A full-stack application for managing and generating examination timetables. Par
 | **Build Tools** | Maven, npm |
 | **Libraries** | jsPDF, SheetJS (xlsx), PapaParse, React Router 7 |
 
-## 📁 Project Structure
-
-```
-Time-Table-Scheduler-ReactJS/
-├── backend/                    # Spring Boot API
-│   ├── src/main/java/         # Java source files
-│   ├── src/main/resources/    # Application properties
-│   └── pom.xml                # Maven configuration
-├── frontend/                   # React application
-│   ├── src/
-│   │   ├── Components/        # Reusable UI components
-│   │   ├── Pages/             # Page components (Dashboard, ExamTimetable, Settings)
-│   │   ├── Icons/             # SVG icon components
-│   │   ├── Script/            # Utility functions & API fetchers
-│   │   ├── Style/             # CSS stylesheets
-│   │   └── data/              # TypeScript types
-│   ├── package.json           # npm dependencies
-│   └── vite.config.ts         # Vite configuration
-├── docker-compose.yml          # MongoDB container setup
-└── README.md
-```
-
-## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -115,7 +88,6 @@ Time-Table-Scheduler-ReactJS/
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8080
 
-## ⚙️ Configuration
 
 ### Backend (`backend/src/main/resources/application.properties`)
 ```properties
@@ -155,14 +127,3 @@ This timetable system is designed to be part of a larger **Automated Examination
 3. **B-Form Generation Module** - Print-ready examination documentation
 4. **Duty Exchange System** - Faculty duty swap with approval workflow
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is for educational purposes.
