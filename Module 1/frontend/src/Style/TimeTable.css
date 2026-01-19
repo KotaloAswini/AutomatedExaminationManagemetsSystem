@@ -1,0 +1,101 @@
+.time-table-container {
+    height: 100%;
+    display: grid;
+    justify-content: stretch;
+    gap: 10px;
+    border-radius: 12px;
+    padding-right: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+}
+
+.time-table-error-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.time-table-container div div {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+.day-container,
+.period-times-container {
+    display: grid;
+    gap: 5px;
+    justify-content: stretch;
+}
+
+.period-details-container.class {
+    border-radius: 10px;
+    cursor: pointer;
+    background: #1479FF;
+    box-shadow: 5px 5px 10px rgba(20, 121, 255, 0.5);
+    color: #fff;
+    font-weight: bold;
+    padding: 0.2rem;
+    box-sizing: border-box;
+}
+
+.period-details-container.class div {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.day-container:nth-child(3) .period-details-container.class {
+    background: #14D2FF;
+    box-shadow: 5px 5px 10px rgba(20, 210, 255, 0.5);
+}
+
+.day-container:nth-child(4) .period-details-container.class {
+    background: #14A5FF;
+    box-shadow: 5px 5px 10px rgba(20, 165, 255, 0.5);
+}
+
+.day-container:nth-child(5) .period-details-container.class {
+    background: #37DBE6;
+    box-shadow: 5px 5px 10px rgba(55, 219, 230, 0.5);
+}
+
+@media (max-width: 680px) {
+    .time-table-container {
+        gap: 3px;
+    }
+}
+
+/* Dark Mode TimeTable */
+body.dark .time-table-container {
+    background: var(--foregroudColor);
+    color: var(--textColor);
+}
+
+body.dark .time-table-error-text {
+    color: var(--textColor);
+}
+
+body.dark .period-details-container.class {
+    background: #3b82f6;
+    box-shadow: 5px 5px 10px rgba(59, 130, 246, 0.5);
+    color: #ffffff;
+}
+
+body.dark .day-container:nth-child(3) .period-details-container.class {
+    background: #0ea5e9;
+    box-shadow: 5px 5px 10px rgba(14, 165, 233, 0.5);
+}
+
+body.dark .day-container:nth-child(4) .period-details-container.class {
+    background: #06b6d4;
+    box-shadow: 5px 5px 10px rgba(6, 182, 212, 0.5);
+}
+
+body.dark .day-container:nth-child(5) .period-details-container.class {
+    background: #14b8a6;
+    box-shadow: 5px 5px 10px rgba(20, 184, 166, 0.5);
+}
