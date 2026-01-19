@@ -53,70 +53,31 @@ A full-stack application for managing and generating examination timetables. Par
 - **Java 21** (for Backend)
 - **Docker** (for MongoDB)
 
-### Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Time-Table-Scheduler-ReactJS
-   ```
 
-2. **Start the Database** (MongoDB via Docker)
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Start the Backend** (Spring Boot - runs on port 8080)
-   ```bash
-   cd backend
-   ./mvnw spring-boot:run
-   ```
-   On Windows:
-   ```cmd
-   cd backend
-   mvnw.cmd spring-boot:run
-   ```
-
-4. **Start the Frontend** (Vite dev server - runs on port 5173)
+**Start the Frontend** (Vite dev server - runs on port 5173)
    ```bash
    cd frontend
    npm install
    npm run dev
    ```
-
-5. **Access the Application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:8080
-
-
-### Backend (`backend/src/main/resources/application.properties`)
+   ### Backend (`backend/src/main/resources/application.properties`)
 ```properties
 spring.application.name=timetable-backend
 spring.data.mongodb.uri=mongodb://localhost:27017/timetabledb
 server.port=8080
 ```
 
+**Access the Application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8080
+
+
 ### Docker Compose (`docker-compose.yml`)
 - MongoDB runs on port **27017**
 - Database name: `timetabledb`
 - Data persisted in Docker volume `mongodb_data`
 
-## 📜 Available Scripts
-
-### Frontend
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-
-### Backend
-| Command | Description |
-|---------|-------------|
-| `./mvnw spring-boot:run` | Start Spring Boot server |
-| `./mvnw clean install` | Build the project |
-| `./mvnw test` | Run tests |
 
 ## 🔮 Future Modules (Roadmap)
 
