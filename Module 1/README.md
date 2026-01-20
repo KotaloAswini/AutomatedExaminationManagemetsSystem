@@ -3,12 +3,12 @@
 A web application for creating and managing examination timetables.
 
 ## Tech Stack
-- **Frontend**: React, Vite
+- **Frontend**: React, JavaScript, Vite
 - **Backend**: Spring Boot, Java 21
 - **Database**: MongoDB (Supports both Local and Cloud/Atlas)
 
 ## Quick Start
-1. **Start MongoDB** (Ensure it's running on localhost:27017)
+1. **Start MongoDB** 
 
 2. **Start Backend**
    ```bash
@@ -26,7 +26,7 @@ A web application for creating and managing examination timetables.
 ## Database Configuration
 
 - **Local (Default)**: http://localhost:5173/
-- **Atlas (Cloud)**: 
+
 
 ## Screenshots
 
