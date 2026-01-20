@@ -1,5 +1,5 @@
 // AlertContext.js
-import { createContext, useState, useContext, useCallback } from 'react';
+import { createContext, useState, useContext, useCallback, useMemo } from 'react';
 
 const AlertContext = createContext({
     alert: { message: '', type: 'warning', show: false },
@@ -51,9 +51,9 @@ export const AlertProvider = ({ children }) => {
         }
     }, [])
 
-    const autoCloseAlert = useCallback(deboucer(() => {
+    const autoCloseAlert = useMemo(() => deboucer(() => {
         hideAlert();
-    }, 5000), []);
+    }, 5000), [deboucer]);
 
     return (
         <AlertContext.Provider value={{ alert, showAlert, hideAlert, showWarning, showSuccess, showError }}>
@@ -61,3 +61,4 @@ export const AlertProvider = ({ children }) => {
         </AlertContext.Provider>
     );
 };
+AlertProvider.displayName = 'AlertProvider';

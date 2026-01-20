@@ -43,3 +43,4 @@ export const ConfirmProvider = ({ children }) => {
         </ConfirmContext.Provider>
     );
 };
+ConfirmProvider.displayName = 'ConfirmProvider';

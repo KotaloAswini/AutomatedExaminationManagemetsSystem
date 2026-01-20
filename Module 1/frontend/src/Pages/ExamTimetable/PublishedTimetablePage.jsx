@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState, useCallback } from 'react';
 import '../../Style/Pages/ExamTimetablePage.css';
 import { useAlert } from '../../Components/AlertContextProvider';
 import { useConfirm } from '../../Components/ConfirmContextProvider';
@@ -14,7 +14,7 @@ import Trash from '../../Icons/Trash';
 import EditIcon from '../../Icons/Edit';
 import { getSubjectsDetailsList } from '../../Script/SubjectsDataFetcher';
 import SearchIcon from '../../Icons/Search';
-import CertifiedDocument from '../../Icons/CertifiedDocument';
+import ExamTimetableIcon from '../../Icons/ExamTimetableIcon';
 import Printer from '../../Icons/Printer';
 import Download from '../../Icons/Download';
 
@@ -40,7 +40,7 @@ function PublishedTimetablePage() {
     const [editDate, setEditDate] = useState('');
     const [editStartTime, setEditStartTime] = useState('');
     const [editEndTime, setEditEndTime] = useState('');
-    const [_editRoomNo, setEditRoomNo] = useState('');
+    const [setEditRoomNo] = useState('');
     const [editExamType, setEditExamType] = useState('MSE I');
     const [editTestCoordinator, setEditTestCoordinator] = useState('');
     const [subjectsDetails, setSubjectsDetails] = useState([]);
@@ -57,16 +57,7 @@ function PublishedTimetablePage() {
     const [downloadSemester, setDownloadSemester] = useState();
     const [downloadExamType, setDownloadExamType] = useState('');
 
-    useEffect(() => {
-        loadData();
-        getSubjectsDetailsList(data => {
-            const subjects = data;
-            console.log('Loaded subjects:', subjects);
-            setSubjectsDetails(subjects);
-        });
-    }, [filterSemester, filterDepartment]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true);
         try {
             const examData = await getExams(filterSemester, filterDepartment || undefined, 'PUBLISHED');
@@ -76,7 +67,16 @@ function PublishedTimetablePage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filterSemester, filterDepartment]);
+
+    useEffect(() => {
+        loadData();
+        getSubjectsDetailsList(data => {
+            const subjects = data;
+            console.log('Loaded subjects:', subjects);
+            setSubjectsDetails(subjects);
+        });
+    }, [loadData, filterSemester, filterDepartment]);
 
     const handlePrint = () => {
         if (exams.length === 0) {
@@ -264,7 +264,7 @@ function PublishedTimetablePage() {
         <div className='page exam-timetable student-view'>
             <div className='page-header'>
                 <h1 className='page-title'>
-                    <span className='title-icon'><CertifiedDocument width={28} height={28} /></span>
+                    <span className='title-icon'><ExamTimetableIcon size={28} /></span>
                     Published Examination Timetable
                 </h1>
                 <div className='header-actions'>

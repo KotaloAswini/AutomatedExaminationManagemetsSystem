@@ -37,25 +37,45 @@ npm run dev
 
 ### Step 4: Open the App
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8080
+## Database Configuration
 
-## Features
+The backend supports both Local MongoDB and MongoDB Atlas (Cloud). You can switch between them in `backend/src/main/resources/application.properties`.
 
-- Dashboard with stats and quick actions
-- Create and manage exam timetables
-- Draft and publish workflow
-- Export to PDF/Excel
-- Dark/Light mode
+### 1. Local Database (Default)
+Use this for local development. Ensure MongoDB is running locally.
+```properties
+# Local Database Storage
+spring.data.mongodb.uri=mongodb://localhost:27017/timetabledb
+```
+
+### 2. Online Database (MongoDB Atlas)
+Use this to connect to a cloud database.
+```properties
+# Online Database Storage
+spring.data.mongodb.uri=mongodb+srv://<username>:<password>@<cluster-url>/timetabledb?appName=AEMS
+```
+
+### Exam Timetable Printing
+
+The printable format can be accessed via the "Print" button and supports both direct printing and PDF export.
+
+![Exam Timetable Print Format](./frontend/images/exam-timetable-print.png)
 
 ## Screenshots
 
 ### Dashboard
-![Dashboard](./frontend/images/dashboard.png)
+| Light Mode | Dark Mode |
+|Data | Data |
+| ![Dashboard](./frontend/images/dashboard.png) | ![Dashboard Dark](./frontend/images/dashboard-dark.png) |
 
 ### Exam Timetable
 ![Exam Timetable](./frontend/images/exam-timetable.png)
 
+### Published Timetable
+![Published Timetable](./frontend/images/published-timetable.png)
+
 ### Settings
-![Settings](./frontend/images/settings.png)
+| Light Mode | Dark Mode |
+|Data | Data |
+| ![Settings](./frontend/images/settings.png) | ![Settings Dark](./frontend/images/settings-dark.png) |
 

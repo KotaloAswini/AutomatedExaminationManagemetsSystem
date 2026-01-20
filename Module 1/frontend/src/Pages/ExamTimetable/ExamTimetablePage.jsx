@@ -5,7 +5,7 @@ import EditIcon from '../../Icons/Edit';
 import SearchIcon from '../../Icons/Search';
 import ExamTimetableIcon from '../../Icons/ExamTimetableIcon';
 import CrossIcon from '../../Icons/Cross';
-import CalendarPlus from '../../Icons/CalendarPlus';
+import ExamPaperIcon from '../../Icons/ExamPaperIcon';
 import '../../Style/Pages/ExamTimetablePage.css';
 import { useAlert } from '../../Components/AlertContextProvider';
 import { useConfirm } from '../../Components/ConfirmContextProvider';
@@ -76,27 +76,35 @@ function ExamTimetablePage() {
     const { showErrorConfirm } = useConfirm();
     const location = useLocation();
 
+    // Load functions memoized
+    const loadExams = useCallback(async () => {
+        const data = await getExams(filterSemester, filterDepartment || undefined, 'DRAFT');
+        setExams(data);
+    }, [filterSemester, filterDepartment]);
+
+    const loadConflicts = useCallback(async () => {
+        const result = await checkConflicts(filterSemester, filterDepartment || undefined);
+        setConflicts(result.conflicts);
+        setIsConflictFree(result.conflictFree);
+    }, [filterSemester, filterDepartment]);
+
     // Load initial data
     useEffect(() => {
         loadExams();
         getSubjectsDetailsList(data => setSubjectsDetails(data));
-    }, []);
+    }, [loadExams]);
 
     // Check for edit state from navigation
     useEffect(() => {
         if (location.state?.editExam) {
             handleEditExam(location.state.editExam);
-            // Clear state to prevent re-triggering on refresh? 
-            // Actually router state persists, but handleEditExam just sets state, so it's idempotent-ish.
-            // Ideally we should clear it, but modifying history might be overkill. 
-            // Proceeding with just population.
         }
     }, [location.state]);
 
     // Reload when filters change
     useEffect(() => {
         loadExams();
-    }, [filterSemester, filterDepartment]);
+    }, [loadExams]);
 
     useEffect(() => {
         localStorage.setItem('testCoordinator', testCoordinator);
@@ -110,18 +118,7 @@ function ExamTimetablePage() {
             setConflicts([]);
             setIsConflictFree(true);
         }
-    }, [exams]);
-
-    const loadExams = async () => {
-        const data = await getExams(filterSemester, filterDepartment || undefined, 'DRAFT');
-        setExams(data);
-    };
-
-    const loadConflicts = async () => {
-        const result = await checkConflicts(filterSemester, filterDepartment || undefined);
-        setConflicts(result.conflicts);
-        setIsConflictFree(result.conflictFree);
-    };
+    }, [exams, loadConflicts]);
 
     const handleScheduleExam = useCallback(async () => {
         const isConnected = await checkDbConnection();
@@ -216,7 +213,7 @@ function ExamTimetablePage() {
             },
             showError
         );
-    }, [editingExam, examDate, selectedTimeSlot, hallId, showError, showSuccess, loadExams]);
+    }, [editingExam, examDate, selectedTimeSlot, hallId, showError, showSuccess, loadExams, selectedSemester, selectedDepartment, selectedCourse, testCoordinator, examType]);
 
     const handleDeleteExam = useCallback((id) => {
         console.log('Delete button clicked for exam ID:', id);
@@ -418,7 +415,7 @@ function ExamTimetablePage() {
                         {editingExam ? (
                             <><EditIcon width={22} height={22} /> Edit Exam</>
                         ) : (
-                            <><CalendarPlus size={22} /> Schedule Exam</>
+                            <><ExamPaperIcon size={22} /> Schedule Exam</>
                         )}
                     </h2>
 

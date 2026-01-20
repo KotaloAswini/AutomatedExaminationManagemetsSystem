@@ -71,7 +71,7 @@ function MainApp() {
 			})
 			removeWindowCloseEventHandler()
 		}
-	}, [])
+	}, [showError, showWarningConfirm])
 
 	return (
 		<div className='app light' ref={app}>

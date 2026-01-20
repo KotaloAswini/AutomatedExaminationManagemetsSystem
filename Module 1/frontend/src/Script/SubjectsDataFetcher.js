@@ -14,7 +14,7 @@ export const getSubjectsList = async (
         if (response.status === 200) {
             try {
                 listArray = await response.json();
-            } catch (error) {
+            } catch {
                 const text = await response.text();
                 console.log("%cSubject List Data is invaild", "color: orange;", text);
             }
@@ -43,7 +43,7 @@ export const getSubjectsDetailsList = async (onSuccess = () => { }) => {
             let listArray = [];
             try {
                 listArray = await response.json();
-            } catch (error) {
+            } catch {
                 console.log("%cSubjects Data is invaild", "color: orange;", await response.text());
             }
             onSuccess(listArray);
@@ -69,7 +69,7 @@ export const getSubject = async (subjectName, onSuccess = () => { }) => {
             let data;
             try {
                 data = await response.json();
-            } catch (error) {
+            } catch {
                 console.log("%cSubject Details Data is invaild", "color: red;", await response.text());
             }
             onSuccess(data);

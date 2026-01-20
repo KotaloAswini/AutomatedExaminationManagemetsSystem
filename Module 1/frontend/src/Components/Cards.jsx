@@ -58,7 +58,9 @@ const Cards = ({
     )
 }
 
-export default memo(Cards)
+const CardsComponent = memo(Cards)
+CardsComponent.displayName = 'Cards'
+export default CardsComponent
 
 export const Card = memo(({
     details = "Sample",
@@ -84,6 +86,7 @@ export const Card = memo(({
         ) : innerCard)
     )
 })
+Card.displayName = 'Card'
 
 export const HorizentalCardsContainer = memo(({
     cardList = [],
@@ -122,16 +125,6 @@ export const HorizentalCardsContainer = memo(({
         onChange(newActiveCards)
     }, [activeCards, canStayActiveMultipleCards, onChange])
 
-    const horizentalCardsOnWheelHandler = useCallback((event) => {
-        if (cardsContainer.current == null) return
-        cardsContainer.current.scrollLeft += (event.deltaY);
-        showLeftArrow()
-    }, [])
-    const arrowClickHandler = useCallback((value) => {
-        if (cardsContainer.current == null) return
-        cardsContainer.current.scrollLeft += value;
-        showLeftArrow()
-    }, [])
     const showLeftArrow = useCallback(() => {
         if (cardsContainer.current == null) return
         if (cardsContainer.current.scrollLeft >= 120) {
@@ -140,6 +133,18 @@ export const HorizentalCardsContainer = memo(({
             setShowArrow(false)
         }
     }, [])
+
+    const horizentalCardsOnWheelHandler = useCallback((event) => {
+        if (cardsContainer.current == null) return
+        cardsContainer.current.scrollLeft += (event.deltaY);
+        showLeftArrow()
+    }, [showLeftArrow])
+
+    const arrowClickHandler = useCallback((value) => {
+        if (cardsContainer.current == null) return
+        cardsContainer.current.scrollLeft += value;
+        showLeftArrow()
+    }, [showLeftArrow])
 
     return (
         <div className={'horizental-cards-container ' + className} onWheel={horizentalCardsOnWheelHandler}>
@@ -167,3 +172,4 @@ export const HorizentalCardsContainer = memo(({
         </div>
     )
 })
+HorizentalCardsContainer.displayName = 'HorizentalCardsContainer'
