@@ -278,13 +278,13 @@ body.dark .workflow-compact-card {
     height: 48px;
     font-size: 1.5rem;
     border-radius: 50%;
-    background: white;
-    border: 2px solid var(--edu-border);
-    color: var(--edu-slate);
+    background: linear-gradient(135deg, var(--edu-blue), var(--edu-indigo));
+    border: 2px solid transparent;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -721,7 +721,8 @@ body.dark .tip-box-xs {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 700;
-    color: #64748b; /* --edu-slate fallback */
+    color: #64748b;
+    /* --edu-slate fallback */
 }
 
 .rich-activity-table th:nth-child(3),
@@ -743,13 +744,15 @@ body.dark .tip-box-xs {
     height: 44px;
     background: #f8fafc;
     border-radius: 8px;
-    border: 1px solid #e2e8f0; /* --edu-border fallback */
+    border: 1px solid #e2e8f0;
+    /* --edu-border fallback */
 }
 
 .date-month {
     font-size: 0.6rem;
     font-weight: 700;
-    color: #ef4444; /* --edu-red fallback */
+    color: #ef4444;
+    /* --edu-red fallback */
     text-transform: uppercase;
     line-height: 1;
     margin-bottom: 2px;
@@ -758,7 +761,8 @@ body.dark .tip-box-xs {
 .date-day {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1e293b; /* --edu-dark fallback */
+    color: #1e293b;
+    /* --edu-dark fallback */
     line-height: 1;
 }
 
@@ -781,10 +785,25 @@ body.dark .tip-box-xs {
     flex-shrink: 0;
 }
 
-.avatar-0 { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); }
-.avatar-1 { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); }
-.avatar-2 { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2); }
-.avatar-3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2); }
+.avatar-0 {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.avatar-1 {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+
+.avatar-2 {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+.avatar-3 {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+}
 
 .course-meta {
     display: flex;
@@ -827,21 +846,28 @@ body.dark .tip-box-xs {
     text-transform: capitalize;
     white-space: nowrap;
     transition: all 0.2s;
-    line-height: normal; /* Fix alignment */
+    line-height: normal;
+    /* Fix alignment */
     width: fit-content;
 }
 
 .status-pill.published {
-    background: #ecfdf5; /* emerald-50 */
-    color: #059669; /* emerald-600 */
-    border: 1px solid #a7f3d0; /* emerald-200 */
+    background: #ecfdf5;
+    /* emerald-50 */
+    color: #059669;
+    /* emerald-600 */
+    border: 1px solid #a7f3d0;
+    /* emerald-200 */
     box-shadow: 0 1px 2px rgba(5, 150, 105, 0.05);
 }
 
 .status-pill.draft {
-    background: #fffbeb; /* amber-50 */
-    color: #d97706; /* amber-600 */
-    border: 1px solid #fde68a; /* amber-200 */
+    background: #fffbeb;
+    /* amber-50 */
+    color: #d97706;
+    /* amber-600 */
+    border: 1px solid #fde68a;
+    /* amber-200 */
     box-shadow: 0 1px 2px rgba(217, 119, 6, 0.05);
 }
 
@@ -851,15 +877,19 @@ body.dark .date-box {
     border-color: #334155;
     color: white;
 }
+
 body.dark .date-day {
     color: #f1f5f9;
 }
+
 body.dark .course-name-text {
     color: #f1f5f9;
 }
+
 body.dark .course-id-text {
     color: #cbd5e1;
 }
+
 body.dark .badge-pill-light {
     background: rgba(255, 255, 255, 0.05);
     border-color: #475569;

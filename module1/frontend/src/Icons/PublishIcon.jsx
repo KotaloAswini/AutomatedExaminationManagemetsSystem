@@ -9,7 +9,7 @@ const PublishIcon = ({ className = "", size = 24 }) => {
             height={size}
             xmlns="http://www.w3.org/2000/svg"
         >
-            <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z" />
+            <path fill="currentColor" d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z" />
         </svg>
     );
 };
