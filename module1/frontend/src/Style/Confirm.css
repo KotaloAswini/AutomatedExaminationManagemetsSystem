@@ -1,0 +1,159 @@
+.confirm {
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.6rem;
+    display: none;
+    gap: 0.5rem;
+    justify-content: space-between;
+    position: fixed;
+    top: -10rem;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    transition: 0.3s;
+    border-width: 1px;
+    border-style: solid;
+    background: #fff;
+    color: #000;
+    min-width: 220px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.confirm.active {
+    display: flex;
+    top: 60%;
+    z-index: 1000;
+}
+
+.confirm.success {
+    background: #d4edda;
+    color: #155724;
+    border-color: #155724;
+}
+
+.confirm.warning {
+    background: #fff3cd;
+    color: #856404;
+    border-color: #856404;
+}
+
+.confirm.error {
+    background: #fff;
+    color: #dc3545;
+    border-color: #dc3545;
+    border-width: 3px;
+    box-shadow: 0 12px 40px rgba(220, 53, 69, 0.5);
+}
+
+.confirm.error p {
+    color: #dc3545;
+}
+
+.confirm p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.confirm .btns-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.confirm .btns-container .approve,
+.confirm .btns-container .decline {
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.confirm .btns-container .approve:hover,
+.confirm .btns-container .decline:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.confirm .btns-container .approve {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.confirm .btns-container .approve:hover {
+    background: #1d4ed8;
+}
+
+.confirm .btns-container .decline {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+.confirm .btns-container .decline:hover {
+    background: #d97706;
+}
+
+/* Dark Mode Confirm Styles */
+body.dark .confirm {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #475569;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+}
+
+body.dark .confirm.success {
+    background: #064e3b;
+    color: #6ee7b7;
+    border-color: #10b981;
+}
+
+body.dark .confirm.warning {
+    background: #78350f;
+    color: #fcd34d;
+    border-color: #f59e0b;
+}
+
+body.dark .confirm.error {
+    background: #1e293b;
+    color: #ef4444;
+    border-color: #ef4444;
+    box-shadow: 0 12px 40px rgba(239, 68, 68, 0.5);
+}
+
+body.dark .confirm.error p {
+    color: #ef4444;
+}
+
+body.dark .confirm .btns-container .approve {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+body.dark .confirm .btns-container .approve:hover {
+    background: #2563eb;
+    filter: brightness(1.1);
+}
+
+body.dark .confirm .btns-container .decline {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+body.dark .confirm .btns-container .decline:hover {
+    background: #d97706;
+    filter: brightness(1.1);
+}
