@@ -1,0 +1,131 @@
+.settings-container {
+    padding: 30px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    color: var(--textColor);
+}
+
+.settings-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #1479FF 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+.settings-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--borderColor);
+    transition: all 0.3s ease;
+}
+
+body.dark .settings-section {
+    background: var(--containerColor);
+    border-color: var(--borderColor);
+}
+
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: var(--accentColor);
+    border-bottom: 1px solid var(--borderColor);
+    padding-bottom: 15px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.setting-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.setting-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #8898aa;
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e0;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider {
+    background-color: #1479FF;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #1479FF;
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Dark Mode Overrides */
+body.dark .settings-title {
+    /* Keep gradient or adjust for dark mode visibility */
+}
+
+body.dark .settings-section {
+    background: #2d3748;
+    /* Darker bg for cards */
+    border-color: #4a5568;
+}
+
+body.dark .setting-info h3 {
+    color: #f7fafc;
+}
