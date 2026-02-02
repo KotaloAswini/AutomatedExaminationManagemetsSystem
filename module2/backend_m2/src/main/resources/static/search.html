@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Seating Search</title>
+
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+        }
+
+        /* WATERMARK BACKGROUND LOGO */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-image: url("/images/nmit.logo.jpeg");
+            background-repeat: no-repeat;
+            background-size: 300px;
+            width: 300px;
+            height: 300px;
+            opacity: 0.15;   /* watermark effect */
+            z-index: -1;
+        }
+
+        input {
+            padding: 8px;
+            width: 260px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Student Seating Search</h2>
+
+    <input type="text" id="usn" placeholder="Enter USN (e.g. INT22CS025)">
+    <br><br>
+
+    <button onclick="findSeat()">Find Seat</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function findSeat() {
+            let usn = document.getElementById("usn").value.trim();
+
+            if (usn === "") {
+                document.getElementById("result").innerText = "Please enter USN";
+                return;
+            }
+
+            fetch("/seats/find?usn=" + usn)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("result").innerText = data.error;
+                    } else {
+                        document.getElementById("result").innerHTML =
+                            "USN: " + data.USN + "<br>" +
+                            "Room: " + data.Room + "<br>" +
+                            "Seat: " + data.Seat;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("result").innerText = "Error fetching seat details";
+                });
+        }
+    </script>
+
+</body>
+</html>

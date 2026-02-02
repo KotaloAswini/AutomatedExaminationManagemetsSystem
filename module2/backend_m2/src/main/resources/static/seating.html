@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NMIT MSE-1 Seating Allotment</title>
+
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            font-size: 14px;
+        }
+
+        .room {
+            border: 2px solid black;
+            padding: 10px;
+            width: 900px;
+            margin: 30px auto;
+            page-break-after: always;
+        }
+
+        .center {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* HEADER + LOGO */
+        .header {
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 85px;
+        }
+
+        .details-table {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .details-table td {
+            padding: 4px;
+            font-weight: bold;
+        }
+
+        .board {
+            border: 1px solid black;
+            text-align: center;
+            font-weight: bold;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 4fr;
+            gap: 10px;
+        }
+
+        .door {
+            border: 2px solid black;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            height: fit-content;
+        }
+
+        .benches {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .bench {
+            border: 1px solid black;
+            padding: 6px 10px;
+            height: 35px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="allRooms"></div>
+
+<script>
+    let totalRooms = 12;
+    let benchesPerRoom = 18;
+    let studentsPerRoom = 25;
+
+    let usnCounter = 1;
+    let container = document.getElementById("allRooms");
+
+    for (let room = 1; room <= totalRooms; room++) {
+
+        let roomDiv = document.createElement("div");
+        roomDiv.className = "room";
+
+        roomDiv.innerHTML = `
+            <div class="center header">
+                NITTE MEENAKSHI INSTITUTE OF TECHNOLOGY (NMIT)<br>
+                DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING<br>
+                SEATING ALLOTMENT MSE1
+
+                <img src="/images/nmit.logo.jpeg" class="logo" alt="NMIT Logo">
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <td>Date: __________</td>
+                    <td>Session: FN / AN</td>
+                    <td>Room No: ${String(room).padStart(3,"0")}</td>
+                </tr>
+                <tr>
+                    <td>Subject: __________</td>
+                    <td>Semester: __________</td>
+                    <td>Academic Year: 2025-2026</td>
+                </tr>
+            </table>
+
+            <div class="board">BOARD</div>
+
+            <div class="layout">
+                <div class="door">DOOR</div>
+                <div class="benches"></div>
+            </div>
+        `;
+
+        let benchesDiv = roomDiv.querySelector(".benches");
+        let studentsPlaced = 0;
+
+        for (let b = 1; b <= benchesPerRoom; b++) {
+            if (studentsPlaced >= studentsPerRoom) break;
+
+            let bench = document.createElement("div");
+            bench.className = "bench";
+
+            let s1 = "";
+            let s2 = "";
+
+            if (studentsPlaced < studentsPerRoom) {
+                s1 = "INT22CS" + String(usnCounter++).padStart(3,"0");
+                studentsPlaced++;
+            }
+
+            if (studentsPlaced < studentsPerRoom) {
+                s2 = "INT22CS" + String(usnCounter++).padStart(3,"0");
+                studentsPlaced++;
+            }
+
+            bench.innerHTML = `
+                <span style="float:left">${s1}</span>
+                <span style="float:right">${s2}</span>
+                <div style="clear:both"></div>
+            `;
+
+            benchesDiv.appendChild(bench);
+        }
+
+        container.appendChild(roomDiv);
+    }
+</script>
+
+</body>
+</html>
