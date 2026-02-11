@@ -592,18 +592,24 @@ body.dark .exam-search-icon {
     max-height: 500px;
     overflow-y: auto;
     border-radius: 12px;
-    /* Remove shadow from container, move to rows */
-    background: transparent;
+    background: var(--containerColor, #fff);
     border: none;
-    padding: 0.5rem;
+    padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
 .exam-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 0.35rem;
-    /* Space between rows */
+    border-spacing: 0;
     font-size: 0.8rem;
+}
+
+.exam-table tbody tr {
+    border-spacing: 0;
+}
+
+.exam-table tbody td {
+    border-bottom: 4px solid var(--containerColor, #fff);
 }
 
 /* Optional: header vertical lines to match */
