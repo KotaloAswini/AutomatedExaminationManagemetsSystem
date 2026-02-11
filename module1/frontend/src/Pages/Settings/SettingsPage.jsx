@@ -1,11 +1,6 @@
 import { memo, useState, useEffect } from 'react';
 import '../../Style/UnifiedPages.css';
 import '../../Style/Pages/Settings.css';
-import Moon from '../../Icons/Moon';
-import Sun from '../../Icons/Sun';
-import User from '../../Icons/User';
-import Mail from '../../Icons/Mail';
-import Setting from '../../Icons/Setting';
 
 // Function to handle global theme changes
 export function changeTheme(theme) {
@@ -49,7 +44,7 @@ function SettingsPage() {
                 <div className='settings-card appearance-card'>
                     <div className='card-header'>
                         <div className='card-header-icon'>
-                            <Moon />
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
                         </div>
                         <div>
                             <h2>Appearance</h2>
@@ -61,14 +56,28 @@ function SettingsPage() {
                             className={`theme-btn ${currentTheme === 'Light' ? 'active' : ''}`}
                             onClick={() => handleThemeChange('Light')}
                         >
-                            <Sun />
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v2" />
+                                <path d="M12 20v2" />
+                                <path d="m4.93 4.93 1.41 1.41" />
+                                <path d="m17.66 17.66 1.41 1.41" />
+                                <path d="M2 12h2" />
+                                <path d="M20 12h2" />
+                                <path d="m6.34 17.66-1.41 1.41" />
+                                <path d="m19.07 4.93-1.41 1.41" />
+                            </svg>
                             <span>Light</span>
                         </button>
                         <button
                             className={`theme-btn ${currentTheme === 'Dark' ? 'active' : ''}`}
                             onClick={() => handleThemeChange('Dark')}
                         >
-                            <Moon />
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                <circle cx="18" cy="5" r="1" fill="currentColor" stroke="none" />
+                                <circle cx="20" cy="9" r="0.5" fill="currentColor" stroke="none" />
+                            </svg>
                             <span>Dark</span>
                         </button>
                         <button
@@ -76,9 +85,10 @@ function SettingsPage() {
                             onClick={() => handleThemeChange('System')}
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                                <line x1="8" y1="21" x2="16" y2="21" />
-                                <line x1="12" y1="17" x2="12" y2="21" />
+                                <rect x="2" y="3" width="20" height="14" rx="2" />
+                                <path d="M8 21h8" />
+                                <path d="M12 17v4" />
+                                <path d="m7 10 2 2 4-4" />
                             </svg>
                             <span>System</span>
                         </button>
@@ -121,7 +131,7 @@ function SettingsPage() {
                             </div>
                             <div className='contributor-contact'>
                                 <a href="mailto:imlalan7@gmail.com" className='contact-chip'>
-                                    <Mail className='icon-svg' />
+                                    <svg className='icon-svg' width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
                                     <span>imlalan7@gmail.com</span>
                                 </a>
                             </div>
@@ -152,7 +162,7 @@ function SettingsPage() {
                             </div>
                             <div className='contributor-contact'>
                                 <a href="mailto:kotaloaswini@gmail.com" className='contact-chip'>
-                                    <Mail className='icon-svg' />
+                                    <svg className='icon-svg' width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
                                     <span>kotaloaswini@gmail.com</span>
                                 </a>
                             </div>

@@ -391,11 +391,42 @@ function ExamTimetablePage() {
         );
     };
 
-    // Filter exams based on search query
-    const filteredExams = exams.filter(exam =>
-        exam.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (exam.department && exam.department.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    // Filter exams based on search query (by name, department, or date)
+    const filteredExams = exams.filter(exam => {
+        const query = searchQuery.trim().toLowerCase();
+        if (!query) return true;
+        // Match by course name
+        if (exam.courseName && exam.courseName.toLowerCase().includes(query)) return true;
+        // Match by department
+        if (exam.department && exam.department.toLowerCase().includes(query)) return true;
+        // Match by date in any format
+        if (exam.examDate) {
+            const dateStr = String(exam.examDate); // ensure it's a string
+            // Match raw API format "2026-01-29"
+            if (dateStr.includes(query)) return true;
+            // Convert to dd-mm-yyyy for matching (as displayed in table)
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                const ddmmyyyy = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                if (ddmmyyyy.includes(query)) return true;
+            }
+            // Match human-readable formats (e.g. "Feb 11", "Wed", "January", "Wednesday")
+            try {
+                const d = new Date(dateStr + 'T00:00:00');
+                if (!isNaN(d.getTime())) {
+                    const long = d.toLocaleDateString('en-US', {
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    }).toLowerCase();
+                    if (long.includes(query)) return true;
+                    const short = d.toLocaleDateString('en-US', {
+                        weekday: 'short', month: 'short', day: 'numeric'
+                    }).toLowerCase();
+                    if (short.includes(query)) return true;
+                }
+            } catch (e) { /* ignore parse errors */ }
+        }
+        return false;
+    });
 
     // Group exams by date for display
     const examsByDate = filteredExams.reduce((acc, exam) => {
@@ -425,7 +456,7 @@ function ExamTimetablePage() {
                         <input
                             type="text"
                             className="exam-search-input"
-                            placeholder="Search exams..."
+                            placeholder="Search by name or date..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -839,11 +870,13 @@ function ExamTimetablePage() {
                                             >
                                                 {idx === 0 && (
                                                     <td rowSpan={dateExams.length} className='date-cell'>
-                                                        {new Date(date).toLocaleDateString('en-US', {
-                                                            weekday: 'short',
-                                                            month: 'short',
-                                                            day: 'numeric'
-                                                        })}
+                                                        {(() => {
+                                                            const d = new Date(date);
+                                                            const day = String(d.getDate()).padStart(2, '0');
+                                                            const month = String(d.getMonth() + 1).padStart(2, '0');
+                                                            const year = d.getFullYear();
+                                                            return `${day}-${month}-${year}`;
+                                                        })()}
                                                     </td>
                                                 )}
                                                 <td className='time-cell'>{formatTo12Hour(exam.startTime)} - {formatTo12Hour(exam.endTime)}</td>

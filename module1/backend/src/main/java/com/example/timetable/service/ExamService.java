@@ -98,9 +98,10 @@ public class ExamService {
         examRepository.deleteById(id);
     }
 
-    // Detect all conflicts
+    // Detect all conflicts (only among DRAFT exams — published exams are already
+    // locked)
     public ConflictResult detectConflicts(Integer semester, String department) {
-        List<Exam> exams = getExams(semester, department, null);
+        List<Exam> exams = getExams(semester, department, ExamStatus.DRAFT);
         List<Conflict> conflicts = new ArrayList<>();
 
         for (int i = 0; i < exams.size(); i++) {
@@ -200,7 +201,7 @@ public class ExamService {
 
     // Auto-resolve conflicts by rescheduling
     public int autoResolveConflicts(Integer semester, String department) {
-        List<Exam> allExams = getExams(semester, department, null);
+        List<Exam> allExams = getExams(semester, department, ExamStatus.DRAFT);
         List<Exam> examsToReschedule = new ArrayList<>();
         List<Exam> stableExams = new ArrayList<>();
 

@@ -245,15 +245,48 @@ function PublishedTimetablePage() {
         setEditingExam(null);
     };
 
-    // Group exams by date
+    // Filter and group exams by date
     const examsByDate = exams
-        .filter(exam =>
-            (!filterExamType || exam.examType === filterExamType) &&
-            (searchQuery === '' ||
-                exam.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (exam.department && exam.department.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
-        )
+        .filter(exam => {
+            // Exam type filter
+            if (filterExamType && exam.examType !== filterExamType) return false;
+            // Search query filter (by name, department, or date)
+            const query = searchQuery.trim().toLowerCase();
+            if (!query) return true;
+            if (exam.courseName && exam.courseName.toLowerCase().includes(query)) return true;
+            if (exam.department && exam.department.toLowerCase().includes(query)) return true;
+            if (exam.examDate) {
+                const dateStr = String(exam.examDate);
+
+                // 1. Match raw API format "2026-01-29"
+                if (dateStr.includes(query)) return true;
+
+                // 2. Match dd-mm-yyyy format using string manipulation (reliable for ISO strings)
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const ddmmyyyy = `${parts[2]}-${parts[1]}-${parts[0]}`; // 29-01-2026
+                    if (ddmmyyyy.includes(query)) return true;
+                }
+
+                // 3. Match displayed date format accurately (handling timezone shifts)
+                try {
+                    const d = new Date(dateStr);
+                    if (!isNaN(d.getTime())) {
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const year = d.getFullYear();
+                        const displayDate = `${day}-${month}-${year}`;
+
+                        if (displayDate.includes(query)) return true;
+
+                        // Also match human formats
+                        const long = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toLowerCase();
+                        if (long.includes(query)) return true;
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            return false;
+        })
         .reduce((acc, exam) => {
             if (!acc[exam.examDate]) acc[exam.examDate] = [];
             acc[exam.examDate].push(exam);
@@ -330,7 +363,7 @@ function PublishedTimetablePage() {
                         <input
                             type="text"
                             className="exam-search-input"
-                            placeholder="Search exams..."
+                            placeholder="Search by name or date..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />

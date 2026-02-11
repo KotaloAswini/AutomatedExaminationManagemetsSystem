@@ -13,7 +13,7 @@ import DraftIcon from '../../Icons/DraftIcon';
 import PublishIcon from '../../Icons/PublishIcon';
 import BookStackIcon from '../../Icons/BookStackIcon';
 import ExamPaperIcon from '../../Icons/ExamPaperIcon';
-import HourglassIcon from '../../Icons/HourglassIcon';
+import DraftsDashedIcon from '../../Icons/DraftsDashedIcon';
 import CheckCircleIcon from '../../Icons/CheckCircleIcon';
 
 function DashboardPage() {
@@ -49,7 +49,13 @@ function DashboardPage() {
             const status = await getExamStatus();
             setExamStatus(status);
             const exams = await getExams();
-            setRecentExams(exams.slice(0, 5));
+            // Sort by ID to show most recently created exams first
+            const sortedByCreation = [...exams].sort((a, b) => {
+                if (a.id > b.id) return -1;
+                if (a.id < b.id) return 1;
+                return 0;
+            });
+            setRecentExams(sortedByCreation.slice(0, 5));
 
             const healthStatus = await getHealthStatus();
             setHealth(healthStatus);
@@ -96,7 +102,7 @@ function DashboardPage() {
                         </div>
                     </div>
                     <div className='mini-stat-item'>
-                        <span className='icon-orange'><HourglassIcon size={28} /></span>
+                        <span className='icon-orange'><DraftsDashedIcon size={28} /></span>
                         <div>
                             <strong>{examStatus.draft}</strong>
                             <small>Drafts</small>
@@ -179,7 +185,6 @@ function DashboardPage() {
                                         <th>Date</th>
                                         <th>Course</th>
                                         <th>Sem</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -195,16 +200,11 @@ function DashboardPage() {
                                                 <div className='course-row'>
                                                     <div className='course-meta'>
                                                         <div className='course-name-text' title={exam.courseName}>{exam.courseName}</div>
-                                                        <div className='course-id-text'>Dept: {exam.department || 'General'}</div>
+                                                        <div className='course-id-text'>Dept: <span className='dept-badge'>{exam.department || 'CSE'}</span></div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td><span className='badge-pill-light'>SEM {exam.semester}</span></td>
-                                            <td>
-                                                <span className={`status-pill ${exam.status.toLowerCase()}`}>
-                                                    {exam.status.charAt(0) + exam.status.slice(1).toLowerCase()}
-                                                </span>
-                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
