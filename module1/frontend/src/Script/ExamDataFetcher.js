@@ -65,25 +65,18 @@ export async function updateExam(
     onError
 ) {
     try {
-        console.log('Sending PUT request to:', `${API_URL}/api/exams/${id}`);
-        console.log('Request body:', updates);
-
         const response = await fetch(`${API_URL}/api/exams/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updates)
         });
 
-        console.log('Response status:', response.status);
-
         if (!response.ok) {
             const error = await response.json();
-            console.error('Error response:', error);
             throw new Error(error.error || 'Failed to update');
         }
 
         const data = await response.json();
-        console.log('Update successful, received data:', data);
         onSuccess(data);
     } catch (error) {
         console.error('Update exam error:', error);
@@ -97,24 +90,19 @@ export async function deleteExam(
     onSuccess,
     onError
 ) {
-    console.log('deleteExam called with ID:', id);
-    console.log('API URL:', `${API_URL}/api/exams/${id}`);
     try {
         const response = await fetch(`${API_URL}/api/exams/${id}`, {
             method: 'DELETE'
         });
 
-        console.log('Delete response status:', response.status);
         if (!response.ok) {
             const error = await response.json();
-            console.error('Delete error response:', error);
             throw new Error(error.error || 'Failed to delete');
         }
 
-        console.log('Delete successful, calling onSuccess');
         onSuccess();
     } catch (error) {
-        console.error('Delete exception:', error);
+        console.error('Delete exam error:', error);
         onError(error instanceof Error ? error.message : 'Failed to delete exam');
     }
 }
@@ -198,17 +186,7 @@ export async function getExamStatus() {
     }
 }
 
-// Get departments list
-export async function getDepartments() {
-    try {
-        const response = await fetch(`${API_URL}/api/exams/departments`);
-        if (!response.ok) throw new Error('Failed to get departments');
-        return await response.json();
-    } catch (error) {
-        console.error('Error getting departments:', error);
-        return [];
-    }
-}
+
 
 // Generate printable timetable HTML
 export function generatePrintableHTML(exams, subjects, title) {

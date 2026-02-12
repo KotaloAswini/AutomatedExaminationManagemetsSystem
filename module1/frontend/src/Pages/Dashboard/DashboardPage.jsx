@@ -8,9 +8,6 @@ import { Link } from 'react-router-dom';
 import Calendar from '../../Icons/Calendar';
 import Eye from '../../Icons/Eye';
 import SettingIcon from '../../Icons/Setting';
-import SubjectsIcon from '../../Icons/SubjectsIcon';
-import DraftIcon from '../../Icons/DraftIcon';
-import PublishIcon from '../../Icons/PublishIcon';
 import BookStackIcon from '../../Icons/BookStackIcon';
 import ExamPaperIcon from '../../Icons/ExamPaperIcon';
 import DraftsDashedIcon from '../../Icons/DraftsDashedIcon';
@@ -88,7 +85,7 @@ function DashboardPage() {
 
                 <div className='mini-stats'>
                     <div className='mini-stat-item'>
-                        <span className='icon-blue'><BookStackIcon size={28} /></span>
+                        <span className='icon-black'><BookStackIcon size={28} /></span>
                         <div>
                             <strong>{subjectCount}</strong>
                             <small>Subjects</small>
@@ -118,23 +115,39 @@ function DashboardPage() {
                 </div>
             </div>
 
-            {/* Middle Row: Workflow */}
+            {/* Middle Row: Workflow Pipeline */}
             <div className='middle-section'>
-                <div className='workflow-compact-card'>
-                    <div className='workflow-steps compact'>
-                        <div className={`step-item ${subjectCount > 0 ? 'completed' : ''}`}>
-                            <div className='step-icon-custom'><SubjectsIcon size={24} /></div>
-                            <span className='step-label'>Subjects</span>
+                <div className='pipeline-card'>
+                    <div className='pipeline-header'>
+                        <span className='pipeline-tag'>PIPELINE</span>
+                    </div>
+                    <div className='pipeline-steps'>
+                        <div className={`pipe-step ${subjectCount > 0 ? 'passed' : 'pending'}`}>
+                            <div className='pipe-indicator'></div>
+                            <div className='pipe-info'>
+                                <span className='pipe-name'>subjects</span>
+                                <span className='pipe-meta'>{subjectCount > 0 ? `${subjectCount} loaded` : 'awaiting...'}</span>
+                            </div>
                         </div>
-                        <div className='step-connector'></div>
-                        <div className={`step-item ${examStatus.total > 0 ? 'completed' : ''}`}>
-                            <div className='step-icon-custom'><DraftIcon size={24} /></div>
-                            <span className='step-label'>Create Draft</span>
+                        <div className='pipe-arrow'>
+                            <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h16M12 1l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
-                        <div className='step-connector'></div>
-                        <div className={`step-item ${examStatus.published > 0 ? 'completed' : ''}`}>
-                            <div className='step-icon-custom'><PublishIcon size={24} /></div>
-                            <span className='step-label'>Publish</span>
+                        <div className={`pipe-step ${examStatus.total > 0 ? 'passed' : 'pending'}`}>
+                            <div className='pipe-indicator'></div>
+                            <div className='pipe-info'>
+                                <span className='pipe-name'>draft</span>
+                                <span className='pipe-meta'>{examStatus.total > 0 ? `${examStatus.draft} scheduled` : 'awaiting...'}</span>
+                            </div>
+                        </div>
+                        <div className='pipe-arrow'>
+                            <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h16M12 1l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </div>
+                        <div className={`pipe-step ${examStatus.published > 0 ? 'passed' : 'pending'}`}>
+                            <div className='pipe-indicator'></div>
+                            <div className='pipe-info'>
+                                <span className='pipe-name'>publish</span>
+                                <span className='pipe-meta'>{examStatus.published > 0 ? `${examStatus.published} live` : 'awaiting...'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -216,20 +229,49 @@ function DashboardPage() {
                 {/* Col 3: Insights */}
                 <div className='dashboard-col'>
                     <div className='panel-header-sm'>Insights</div>
-                    <div className='compact-widget'>
+                    <div className='insights-panel'>
+                        <div className='insights-titlebar'>
+                            <div className='insights-tab active'>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                Semester Distribution
+                            </div>
+                        </div>
                         {Object.keys(semesterDistribution).length === 0 ? (
-                            <p className='text-muted-xs'>No data.</p>
+                            <div className='insights-content'>
+                                <div className='insights-no-data'>
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.4"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                    <span>No exam data yet</span>
+                                </div>
+                            </div>
                         ) : (
-                            <div className='compact-dist-list'>
-                                {Object.entries(semesterDistribution).slice(0, 4).map(([sem, count]) => (
-                                    <div key={sem} className='dist-row-sm'>
-                                        <span>{sem}</span>
-                                        <div className='bar-container-sm'>
-                                            <div className='bar-fill-sm' style={{ width: `${(count / examStatus.total) * 100}%` }}></div>
-                                        </div>
-                                        <span>{count}</span>
-                                    </div>
-                                ))}
+                            <div className='insights-content'>
+                                <div className='insights-metrics-list'>
+                                    {Object.entries(semesterDistribution)
+                                        .sort(([, a], [, b]) => b - a)
+                                        .slice(0, 6)
+                                        .map(([sem, count], i) => {
+                                            const pct = Math.round((count / examStatus.total) * 100);
+                                            const maxCount = Math.max(...Object.values(semesterDistribution));
+                                            const barWidth = Math.round((count / maxCount) * 100);
+                                            return (
+                                                <div key={sem} className='insight-metric' style={{ animationDelay: `${i * 0.06}s` }}>
+                                                    <div className='metric-rank'>{i + 1}</div>
+                                                    <div className='metric-body'>
+                                                        <div className='metric-header'>
+                                                            <span className='metric-name'>{sem}</span>
+                                                            <span className='metric-numbers'>
+                                                                <span className='metric-count'>{count}</span>
+                                                                <span className='metric-pct'>{pct}%</span>
+                                                            </span>
+                                                        </div>
+                                                        <div className='metric-bar-bg'>
+                                                            <div className={`metric-bar-fill bar-rank-${i}`} style={{ width: `${barWidth}%` }} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                </div>
                             </div>
                         )}
                     </div>

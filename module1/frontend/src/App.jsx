@@ -11,19 +11,18 @@ import NotFound from './Pages/NotFound/NotFound';
 import SettingsPage, { changeTheme } from './Pages/Settings/SettingsPage';
 import ExamTimetablePage from './Pages/ExamTimetable/ExamTimetablePage';
 import PublishedTimetablePage from './Pages/ExamTimetable/PublishedTimetablePage';
+import AboutUsPage from './Pages/AboutUs/AboutUsPage';
 
 // Styles
 import './App.css'
 import "./Style/BasicComponents.css"
 import "./Style/UnifiedPages.css"
 
-// Scripts
 
-import { addWindowCloseEventHandler, removeWindowCloseEventHandler } from './Script/commonJS';
 
 // Contexts
-import { AlertProvider, useAlert } from './Components/AlertContextProvider';
-import { ConfirmProvider, useConfirm } from './Components/ConfirmContextProvider';
+import { AlertProvider } from './Components/AlertContextProvider';
+import { ConfirmProvider } from './Components/ConfirmContextProvider';
 
 
 function App() {
@@ -41,8 +40,6 @@ function App() {
 function MainApp() {
 	const app = useRef(null)
 
-	const { showWarningConfirm } = useConfirm()
-	const { showError } = useAlert()
 
 	function autoToggleInResize() {
 		if (window.innerWidth <= 1250) {
@@ -59,7 +56,6 @@ function MainApp() {
 		window.addEventListener("resize", () => {
 			autoToggleInResize()
 		})
-		addWindowCloseEventHandler(showWarningConfirm, showError)
 
 		// Initialize Theme from LocalStorage
 		const savedTheme = localStorage.getItem('theme') || 'Light';
@@ -69,9 +65,9 @@ function MainApp() {
 			window.removeEventListener("resize", () => {
 				autoToggleInResize()
 			})
-			removeWindowCloseEventHandler()
+
 		}
-	}, [showError, showWarningConfirm])
+	}, [])
 
 	return (
 		<div className='app light' ref={app}>
@@ -86,6 +82,7 @@ function MainApp() {
 					<Route path="/ExamTimetable" element={<ExamTimetablePage />} />
 					<Route path="/ViewTimetable" element={<PublishedTimetablePage />} />
 					<Route path="/Settings" element={<SettingsPage />} />
+					<Route path="/AboutUs" element={<AboutUsPage />} />
 					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</div>

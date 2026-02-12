@@ -9,14 +9,10 @@ const Confirm = () => {
                 <p>{confirm.message}</p>
                 <div className='btns-container'>
                     <button className='approve' onClick={() => {
-                        console.log('YES BUTTON CLICKED IN CONFIRM DIALOG');
-                        console.log('onApprove callback:', confirm.onApprove);
                         hideConfirm();
                         confirm.onApprove();
-                        console.log('onApprove callback executed');
                     }}>Yes</button>
                     <button className='decline' onClick={() => {
-                        console.log('NO BUTTON CLICKED IN CONFIRM DIALOG');
                         hideConfirm();
                         confirm.onDecline();
                     }}>No</button>

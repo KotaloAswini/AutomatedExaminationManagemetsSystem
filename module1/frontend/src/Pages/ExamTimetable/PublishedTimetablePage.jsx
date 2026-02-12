@@ -40,7 +40,6 @@ function PublishedTimetablePage() {
     const [editDate, setEditDate] = useState('');
     const [editStartTime, setEditStartTime] = useState('');
     const [editEndTime, setEditEndTime] = useState('');
-    const [editRoomNo, setEditRoomNo] = useState('');
     const [editExamType, setEditExamType] = useState('MSE I');
     const [editTestCoordinator, setEditTestCoordinator] = useState('');
     const [subjectsDetails, setSubjectsDetails] = useState([]);
@@ -72,9 +71,7 @@ function PublishedTimetablePage() {
     useEffect(() => {
         loadData();
         getSubjectsDetailsList(data => {
-            const subjects = data;
-            console.log('Loaded subjects:', subjects);
-            setSubjectsDetails(subjects);
+            setSubjectsDetails(data);
         });
     }, [loadData, filterSemester, filterDepartment]);
 
@@ -156,17 +153,14 @@ function PublishedTimetablePage() {
 
     const handleDelete = (id) => {
         showErrorConfirm('⚠️ Permanently delete this exam?', () => {
-            console.log('Deleting exam with ID:', id);
             setLoading(true);
             deleteExam(
                 id,
                 () => {
-                    console.log('Delete successful, reloading data');
                     showSuccess('Exam deleted successfully');
                     loadData();
                 },
                 (msg) => {
-                    console.error('Delete failed:', msg);
                     showError('Failed to delete exam: ' + msg);
                     setLoading(false);
                 }
@@ -175,9 +169,6 @@ function PublishedTimetablePage() {
     };
 
     const handleEdit = (exam) => {
-        console.log('Editing exam:', exam);
-        console.log('Available subjects:', subjectsDetails);
-        console.log('Subjects for semester', exam.semester, ':', subjectsDetails.filter(s => s.sem === exam.semester));
         setEditingExam(exam);
         setEditDepartment(exam.department || 'CSE');
         setEditSemester(exam.semester);
@@ -185,7 +176,6 @@ function PublishedTimetablePage() {
         setEditDate(exam.examDate);
         setEditStartTime(exam.startTime);
         setEditEndTime(exam.endTime);
-        setEditRoomNo(exam.hallId || '');
         setEditExamType(exam.examType || 'MSE I');
         setEditTestCoordinator(exam.testCoordinator || '');
         setShowEditModal(true);
@@ -218,22 +208,17 @@ function PublishedTimetablePage() {
             testCoordinator: editTestCoordinator
         };
 
-        console.log('Updating exam ID:', editingExam.id);
-        console.log('Update data:', updateData);
-
         setLoading(true);
         updateExam(
             editingExam.id,
             updateData,
-            (updatedExam) => {
-                console.log('Exam updated successfully:', updatedExam);
+            () => {
                 showSuccess('Exam updated successfully');
                 setShowEditModal(false);
                 setEditingExam(null);
                 loadData();
             },
             (msg) => {
-                console.error('Error updating exam:', msg);
                 showError(msg);
                 setLoading(false);
             }

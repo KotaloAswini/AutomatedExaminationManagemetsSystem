@@ -1,4 +1,5 @@
 import { memo, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../../Style/UnifiedPages.css';
 import '../../Style/Pages/Settings.css';
 
@@ -40,8 +41,10 @@ function SettingsPage() {
     return (
         <div className='page settings-page'>
             <div className='settings-container'>
-                {/* Appearance Section */}
-                <div className='settings-card appearance-card'>
+                {/* Top Row: Appearance + About Us */}
+                <div className='settings-top-row'>
+                    {/* Appearance Section */}
+                    <div className='settings-card appearance-card'>
                     <div className='card-header'>
                         <div className='card-header-icon'>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
@@ -100,6 +103,27 @@ function SettingsPage() {
                                 ? '🌙 Dark mode is active'
                                 : '☀️ Light mode is active'}
                     </p>
+                </div>
+
+                    {/* About Us Link */}
+                    <Link to="/AboutUs" className='settings-card aboutus-link-card'>
+                        <div className='card-header' style={{ marginBottom: 0 }}>
+                            <div className='card-header-icon aboutus-link-icon'>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 16v-4" />
+                                    <path d="M12 8h.01" />
+                                </svg>
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <h2>About Us</h2>
+                                <p className='card-desc'>About this project</p>
+                            </div>
+                            <svg className='aboutus-arrow' width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </div>
+                    </Link>
                 </div>
 
                 {/* Contributors Section */}

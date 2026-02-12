@@ -85,8 +85,6 @@ public class ScheduleController {
             int sections = (sectionsPerSem != null && sem < sectionsPerSem.size())
                     ? sectionsPerSem.get(sem)
                     : 1;
-            // The logic above was a bit buggy, let's fix
-            sections = (sectionsPerSem != null && sem < sectionsPerSem.size()) ? sectionsPerSem.get(sem) : 1;
             if (sections == 0)
                 sections = 1; // Sanity check
 

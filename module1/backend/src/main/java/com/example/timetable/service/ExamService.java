@@ -57,9 +57,6 @@ public class ExamService {
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
 
         // Allow editing published exams for corrections
-        // if (exam.getStatus() == ExamStatus.PUBLISHED) {
-        // throw new RuntimeException("Cannot modify a published exam");
-        // }
 
         if (updates.getSemester() != null)
             exam.setSemester(updates.getSemester());
@@ -91,9 +88,6 @@ public class ExamService {
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
 
         // Allow deleting published exams
-        // if (exam.getStatus() == ExamStatus.PUBLISHED) {
-        // throw new RuntimeException("Cannot delete a published exam");
-        // }
 
         examRepository.deleteById(id);
     }

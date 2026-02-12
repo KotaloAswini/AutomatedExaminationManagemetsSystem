@@ -16,16 +16,6 @@ public class Subject {
     public Subject() {
     }
 
-    public Subject(String name, Integer semester, Integer lectureCount, String subjectCode, String subjectType,
-            String department) {
-        this.name = name;
-        this.semester = semester;
-        this.lectureCount = lectureCount;
-        this.subjectCode = subjectCode;
-        this.subjectType = subjectType;
-        this.department = department;
-    }
-
     // Getters and Setters
     public String getName() {
         return name;

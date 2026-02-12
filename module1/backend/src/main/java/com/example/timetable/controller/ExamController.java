@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.data.mongodb.core.MongoTemplate;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -20,9 +19,6 @@ public class ExamController {
 
     @Autowired
     private ExamService examService;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     // Get all exams with optional filters
     @GetMapping
@@ -58,7 +54,6 @@ public class ExamController {
         }
     }
 
-    // Update exam (manual adjustment)
     // Update exam (manual adjustment)
     @PutMapping("/{id}")
     public ResponseEntity<?> updateExam(@PathVariable String id, @RequestBody ExamRequest request) {
@@ -144,20 +139,6 @@ public class ExamController {
     @GetMapping("/status")
     public ResponseEntity<?> getStatus() {
         Map<String, Object> stats = new HashMap<>(examService.getStatus());
-
-        // Ensure connectivity keys are present
-        stats.put("backend", "OK");
-        stats.put("debug_version", "v1.1-direct");
-
-        String dbStatus = "Connected";
-        try {
-            mongoTemplate.getDb().runCommand(new org.bson.Document("ping", 1));
-        } catch (Exception e) {
-            dbStatus = "Disconnected";
-            stats.put("db_error", e.getMessage());
-        }
-        stats.put("db", dbStatus);
-
         return ResponseEntity.ok(stats);
     }
 

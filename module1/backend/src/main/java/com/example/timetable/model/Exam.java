@@ -34,17 +34,6 @@ public class Exam {
     public Exam() {
     }
 
-    public Exam(Integer semester, String courseName, LocalDate examDate,
-            LocalTime startTime, LocalTime endTime, String hallId) {
-        this.semester = semester;
-        this.courseName = courseName;
-        this.examDate = examDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.hallId = hallId;
-        this.status = ExamStatus.DRAFT;
-    }
-
     // Getters and Setters
     public String getId() {
         return id;

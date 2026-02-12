@@ -1,5 +1,5 @@
 import "../Style/Menubar.css"
-import Dashboard from "../Icons/Dashboard"
+import Home from "../Icons/Home"
 import Arrow from "../Icons/Arrow"
 import Calendar from "../Icons/Calendar"
 import Eye from "../Icons/Eye"
@@ -10,19 +10,19 @@ import { Link, useLocation } from "react-router-dom"
 
 const menus = [
     {
-        name: "Dashboard",
-        icon: <Dashboard />,
+        name: "Home",
+        icon: <Home />,
         link: "/"
     },
 
     {
-        name: <span>Exam<br />Timetable</span>,
+        name: "Exam Timetable",
         icon: <Calendar />,
         link: "/ExamTimetable",
         title: "Exam Timetable (Admin)"
     },
     {
-        name: <span>View<br />Timetable</span>,
+        name: "View Timetable",
         icon: <Eye />,
         link: "/ViewTimetable",
         title: "View Published Timetable"
@@ -53,7 +53,7 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
                 onMenuToggleClick(e);
             }} className={"toggle-menubar-icon"} />
             <Link to="/" className="title" style={{ textDecoration: "none" }}>
-                <p className="full-title">Timetable<br />Generation</p>
+                <img src="/images/logo.png" alt="AEMS" className="full-title logo-img" />
                 <p className="short-title">AEMS</p>
             </Link>
             <ul className="menus-container">

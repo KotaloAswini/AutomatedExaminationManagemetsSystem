@@ -9,55 +9,61 @@
     height: fit-content;
 }
 
-/* Page Header */
-.settings-page-header {
-    margin-bottom: 2rem;
-}
-
-.settings-title-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.settings-title-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-}
-
-.settings-title-icon svg {
-    width: 24px;
-    height: 24px;
-    stroke: white;
-    color: white;
-}
-
-.settings-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--textColor, #0f172a);
-    margin: 0;
-    letter-spacing: -0.02em;
-}
-
-.settings-subtitle {
-    font-size: 0.9rem;
-    color: var(--textColor2, #64748b);
-    margin: 0.15rem 0 0 0;
-}
-
 /* Settings Container */
 .settings-container {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     max-width: 100%;
+}
+
+/* Top Row */
+.settings-top-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+.settings-top-row .aboutus-link-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    max-width: 170px;
+    padding: 1rem;
+}
+
+.settings-top-row .aboutus-link-card .card-header {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-bottom: 0;
+}
+
+.settings-top-row .aboutus-link-card .card-header h2 {
+    font-size: 0.88rem;
+}
+
+.settings-top-row .aboutus-link-card .card-desc {
+    font-size: 0.68rem;
+}
+
+.settings-top-row .aboutus-link-card .card-header-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+}
+
+.settings-top-row .aboutus-link-card .card-header-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+.settings-top-row .aboutus-link-card .aboutus-arrow {
+    display: none;
 }
 
 /* Card Base */
@@ -204,29 +210,7 @@
     backdrop-filter: blur(10px);
 }
 
-.contributor-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6, #c084fc, #818cf8);
-    background-size: 200% 100%;
-    animation: shimmer 3s ease infinite;
-}
 
-@keyframes shimmer {
-
-    0%,
-    100% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-}
 
 .contributor-card:hover {
     transform: translateY(-4px);
@@ -346,8 +330,8 @@
     gap: 0.35rem;
     padding: 0.35rem 0.75rem;
     border-radius: 8px;
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 400;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
@@ -355,8 +339,8 @@
 }
 
 .social-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 15px;
+    height: 15px;
     transition: transform 0.25s ease;
 }
 
@@ -365,47 +349,92 @@
 }
 
 .social-btn.github {
-    background: linear-gradient(135deg, #24292e, #1b1f23);
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background: transparent;
+    color: #64748b;
+    border: none;
 }
 
 .social-btn.github svg {
-    fill: #ffffff;
+    fill: #64748b;
 }
 
 .social-btn.github:hover {
-    background: linear-gradient(135deg, #1b1f23, #0d1117);
-    box-shadow: 0 4px 14px rgba(36, 41, 46, 0.4);
-    transform: translateY(-2px);
+    color: var(--textColor, #0f172a);
+}
+
+.social-btn.github:hover svg {
+    fill: var(--textColor, #0f172a);
 }
 
 .social-btn.linkedin {
-    background: linear-gradient(135deg, #0a66c2, #0077b5);
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(10, 102, 194, 0.2);
+    background: transparent;
+    color: #64748b;
+    border: none;
 }
 
 .social-btn.linkedin svg {
-    fill: #ffffff;
+    fill: #64748b;
 }
 
 .social-btn.linkedin:hover {
-    background: linear-gradient(135deg, #004182, #005fa3);
-    box-shadow: 0 4px 14px rgba(10, 102, 194, 0.4);
-    transform: translateY(-2px);
+    color: var(--textColor, #0f172a);
+}
+
+.social-btn.linkedin:hover svg {
+    fill: var(--textColor, #0f172a);
 }
 
 /* ========================================
    Dark Mode Overrides
    ======================================== */
 
-body.dark .settings-title {
-    color: #f1f5f9;
+/* About Us Link Card */
+.aboutus-link-card {
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
 }
 
-body.dark .settings-subtitle {
-    color: #94a3b8;
+.aboutus-link-card:hover {
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+.card-header-icon.aboutus-link-icon {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.card-header-icon.aboutus-link-icon svg {
+    stroke: #3b82f6;
+    color: #3b82f6;
+}
+
+.aboutus-arrow {
+    color: var(--textColor2, #94a3b8);
+    stroke: var(--textColor2, #94a3b8);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+}
+
+.aboutus-link-card:hover .aboutus-arrow {
+    transform: translateX(3px);
+    stroke: #6366f1;
+}
+
+body.dark .card-header-icon.aboutus-link-icon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.15));
+}
+
+body.dark .card-header-icon.aboutus-link-icon svg {
+    stroke: #60a5fa;
+    color: #60a5fa;
+}
+
+body.dark .aboutus-arrow {
+    stroke: #64748b;
+}
+
+body.dark .aboutus-link-card:hover .aboutus-arrow {
+    stroke: #a78bfa;
 }
 
 body.dark .settings-card {
@@ -480,10 +509,7 @@ body.dark .contributor-card {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-body.dark .contributor-card::before {
-    background: linear-gradient(90deg, #3b82f6, #06b6d4, #8b5cf6, #3b82f6);
-    background-size: 200% 100%;
-}
+
 
 body.dark .contributor-card:hover {
     border-color: rgba(59, 130, 246, 0.35);
@@ -522,22 +548,37 @@ body.dark .contact-chip .icon-svg {
 }
 
 body.dark .social-btn.github {
-    background: linear-gradient(135deg, #21262d, #161b22);
-    border-color: rgba(48, 54, 61, 0.8);
+    background: transparent;
+    color: #94a3b8;
+}
+
+body.dark .social-btn.github svg {
+    fill: #94a3b8;
 }
 
 body.dark .social-btn.github:hover {
-    background: linear-gradient(135deg, #2d333b, #21262d);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    color: #e2e8f0;
+}
+
+body.dark .social-btn.github:hover svg {
+    fill: #e2e8f0;
 }
 
 body.dark .social-btn.linkedin {
-    background: linear-gradient(135deg, #0a66c2, #0284c7);
+    background: transparent;
+    color: #94a3b8;
+}
+
+body.dark .social-btn.linkedin svg {
+    fill: #94a3b8;
 }
 
 body.dark .social-btn.linkedin:hover {
-    background: linear-gradient(135deg, #0284c7, #0ea5e9);
-    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    color: #e2e8f0;
+}
+
+body.dark .social-btn.linkedin:hover svg {
+    fill: #e2e8f0;
 }
 
 /* ========================================
@@ -557,7 +598,20 @@ body.dark .social-btn.linkedin:hover {
         flex-direction: column;
     }
 
-    .settings-title {
-        font-size: 1.3rem;
+    .settings-top-row {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-top-row .aboutus-link-card {
+        max-width: 100%;
+    }
+
+    .settings-top-row .aboutus-link-card .card-header {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .settings-top-row .aboutus-link-card .aboutus-arrow {
+        display: block;
     }
 }

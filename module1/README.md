@@ -1,12 +1,11 @@
 # Timetable Generation System
 
-A web application for creating and managing examination timetables.
+A simple tool to create, manage, and share exam timetables for schools and colleges.
 
 ## Tech Stack
 - **Frontend**: React, JavaScript, Vite
 - **Backend**: Spring Boot, Java 21
-- **Database**: MongoDB (Supports both Local and Cloud/Atlas)
-
+- **Database**: MongoDB 
 ## Quick Start
 1. **Start MongoDB** 
 
@@ -45,6 +44,9 @@ A web application for creating and managing examination timetables.
 | Light Mode | Dark Mode |
 | --- | --- |
 | ![Settings](./frontend/images/settings.png) | ![Settings Dark](./frontend/images/settings-dark.png) |
+
+### About Us
+![About Us](./frontend/images/About_Us.png)
 
 ### Print Format
 ![Print Format](./frontend/images/exam-timetable-print.png)
