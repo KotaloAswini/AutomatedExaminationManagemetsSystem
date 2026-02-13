@@ -15,7 +15,7 @@ function Search({ setPage, page, setSearchedUSN }) {
 
     try {
      const response = await fetch(
-  `http://127.0.0.1:8080/seating/find?usn=${usn}`
+  `http://127.0.0.1:8080/seats/find?usn=${usn}`
 );
 
 
@@ -39,7 +39,7 @@ Seat Number : ${data.Seat}`);
 // wait 1 minute → then open seating
 setTimeout(() => {
   setPage("seating");
-}, 600); // 60000ms = 1 minute
+}, 6000); // 60000ms = 1 minute
 
 //272 STUDENTS IN EACH SEC
 

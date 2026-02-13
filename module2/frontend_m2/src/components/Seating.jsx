@@ -1,26 +1,60 @@
+import { useEffect, useState } from "react";
 import "./Seating.css";
 
-function Seating({setPage}) {
-  const totalRooms = 12;
-  const studentsPerRoom = 25;
-  let usnCounter = 1;
+function Seating({ setPage, searchedUSN }) {
+
+  const [rooms, setRooms] = useState(null);
+
+  // ✅ Fetch seating
+  useEffect(() => {
+    fetch("http://localhost:8080/seating")
+      .then(res => res.json())
+      .then(data => setRooms(data))
+      .catch((err) => console.log(err));
+  }, []);
+
+  // ✅ AUTO SCROLL TO STUDENT ROOM
+  useEffect(() => {
+
+    if (!rooms || !searchedUSN) return;
+
+    setTimeout(() => {
+      const el = document.getElementById("targetRoom");
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }
+    }, 300);
+
+  }, [rooms, searchedUSN]);
+
+
+  if (!rooms) {
+    return <h2 style={{ textAlign: "center" }}>Loading seating layout...</h2>;
+  }
 
   return (
     <div className="page">
-       {/* BACK BUTTON */}
-      <div style={{ textAlign: "center", margin: "20px" }}>
-   <button className="back-btn" onClick={() => setPage("search")}>
-  ⬅ Back to Search
-</button>
 
+      <div style={{ textAlign: "center", margin: "20px" }}>
+        <button className="back-btn" onClick={() => setPage("search")}>
+          ⬅ Back to Search
+        </button>
       </div>
 
-      {[...Array(totalRooms)].map((_, roomIndex) => {
-        let studentsPlaced = 0;
+      {Object.entries(rooms).map(([roomName, students], roomIndex) => {
+
+        let studentIndex = 0;
 
         return (
-          <div className="room" key={roomIndex}>
-            {/* HEADER */}
+          <div
+            className="room"
+            key={roomIndex}
+            id={students.includes(searchedUSN) ? "targetRoom" : ""}
+          >
+
             <div className="header">
               <img
                 src="/images/nmit.logo.jpeg"
@@ -35,17 +69,16 @@ function Seating({setPage}) {
               </div>
             </div>
 
-            {/* DETAILS */}
             <table className="details">
               <tbody>
                 <tr>
                   <td>Date: ________</td>
                   <td>Session: FN / AN</td>
-                  <td>Room No: {String(roomIndex + 1).padStart(3, "0")}</td>
+                  <td>Room No: {roomName}</td>
                 </tr>
                 <tr>
                   <td>Subject: ________</td>
-                  <td>Semester: ________</td>
+                  <td>Semester: Mixed</td>
                   <td>Academic Year: 2025-2026</td>
                 </tr>
               </tbody>
@@ -53,34 +86,29 @@ function Seating({setPage}) {
 
             <div className="board">BOARD</div>
 
-            {/* LAYOUT */}
             <div className="layout">
               <div className="door">DOOR</div>
 
               <div className="benches">
-                {[...Array(18)].map((_, benchIndex) => {
-                  if (studentsPlaced >= studentsPerRoom) return null;
 
-                  const s1 =
-                    studentsPlaced < studentsPerRoom
-                      ? `INT22CS${String(usnCounter++).padStart(3, "0")}`
-                      : "";
-                  studentsPlaced++;
+                {[...Array(Math.ceil(students.length / 2))].map((_, benchIndex) => {
 
-                  const s2 =
-                    studentsPlaced < studentsPerRoom
-                      ? `INT22CS${String(usnCounter++).padStart(3, "0")}`
-                      : "";
-                  studentsPlaced++;
+                  const s1 = students[studentIndex++] || "";
+                  const s2 = students[studentIndex++] || "";
 
                   return (
-                   <div className="bench">
-                   <span>{s1}</span>
-                   <span>{s2}</span>
-                   </div>
+                    <div className="bench" key={benchIndex}>
+                      <span className={s1 === searchedUSN ? "highlight" : ""}>
+                        {s1}
+                      </span>
 
+                      <span className={s2 === searchedUSN ? "highlight" : ""}>
+                        {s2}
+                      </span>
+                    </div>
                   );
                 })}
+
               </div>
             </div>
           </div>

@@ -241,3 +241,11 @@
   color: #555;
   margin: 25px 0;
 }
+
+.highlight{             
+  background:#0b57d0;
+  color:white;
+  padding:4px 8px;
+  border-radius:4px;
+}
+
