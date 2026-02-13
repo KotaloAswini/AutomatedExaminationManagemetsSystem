@@ -1,45 +1,64 @@
 package com.example.demo.controller;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.example.demo.service.SeatingData;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class SeatingController {
 
     @GetMapping("/seating")
-    public Map<String, List<String>> generateSeating() {
+public Map<String, List<String>> generateSeating() {
 
-        int totalStudents = 300;
-        int studentsPerRoom = 30;
-        int totalRooms = totalStudents / studentsPerRoom; // 10 rooms
+    // ⭐ DO NOT regenerate if already exists
+    if (!SeatingData.seating.isEmpty()) {
+        return SeatingData.seating;
+    }
 
-        // Generate USN list: 1NT22CS001 to 1NT22CS300
+    Map<String, List<String>> seating = SeatingData.seating;
+
+
         List<String> students = new ArrayList<>();
-        for (int i = 1; i <= totalStudents; i++) {
-            students.add(String.format("1NT22CS%03d", i));
+
+        // Generate students from 3 sems
+        for (int i = 1; i <= 272; i++) {
+            students.add(String.format("1NT23CS%03d", i));
+            students.add(String.format("1NT24CS%03d", i));
+            students.add(String.format("1NT25CS%03d", i));
         }
 
-        Map<String, List<String>> seating = new LinkedHashMap<>();
+        // ⭐ Shuffle ONLY ONCE
+        Collections.shuffle(students);
 
-        int studentIndex = 0;
+        int index = 0;
 
-        // Allocate students room-wise
-        for (int room = 1; room <= totalRooms; room++) {
-            List<String> roomStudents = new ArrayList<>();
+        // ✅ 12 Classes (48 students each)
+        for (int c = 1; c <= 12; c++) {
 
-            for (int i = 0; i < studentsPerRoom; i++) {
-                roomStudents.add(students.get(studentIndex));
-                studentIndex++;
+            List<String> classStudents = new ArrayList<>();
+
+            for (int i = 0; i < 48 && index < students.size(); i++) {
+                classStudents.add(students.get(index++));
             }
 
-            seating.put("Lab " + room, roomStudents);
+            seating.put("Class " + c, classStudents);
         }
+// ✅ 8 Labs (30 students each)
+        for (int l = 1; l <= 8; l++) {
+
+            List<String> labStudents = new ArrayList<>();
+
+            for (int i = 0; i < 30 && index < students.size(); i++) {
+                labStudents.add(students.get(index++));
+            }
+
+            seating.put("Lab " + l, labStudents);
+        }
+
+
 
         return seating;
     }
-}
+}  
