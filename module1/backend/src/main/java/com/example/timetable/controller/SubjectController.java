@@ -3,6 +3,7 @@ package com.example.timetable.controller;
 import com.example.timetable.model.Subject;
 import com.example.timetable.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +35,17 @@ public class SubjectController {
     }
 
     @PutMapping("/{name}")
-    public Subject saveSubject(@PathVariable String name, @RequestBody Subject subject) {
-        subject.setName(name);
-        return subjectRepository.save(subject);
+    public ResponseEntity<?> saveSubject(@PathVariable String name, @RequestBody Subject subject) {
+        System.out.println("Module 1: PUT request for subject: " + name);
+        try {
+            subject.setName(name);
+            Subject saved = subjectRepository.save(subject);
+            System.out.println("✓ Module 1: Subject saved: " + saved.getName());
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            System.err.println("⚠ Module 1 Error saving subject: " + e.getMessage());
+            return ResponseEntity.status(500).body("Backend Error: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{name}")
@@ -66,7 +75,7 @@ public class SubjectController {
             @RequestParam(required = false) Integer semester) {
         return subjectRepository.findAll().stream()
                 .filter(s -> (department == null || department.equals(s.getDepartment())))
-                .filter(s -> (semester == null || semester.equals(s.getSem())))
+                .filter(s -> (semester == null || semester.equals(s.getSemester())))
                 .collect(Collectors.toList());
     }
 }

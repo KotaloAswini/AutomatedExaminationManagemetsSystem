@@ -23,6 +23,13 @@
     padding: 0;
 }
 
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+}
+
 .menubar-container .title {
     font-size: 1.5rem;
     color: #1479FF;
@@ -47,7 +54,8 @@
 }
 
 body.dark .menubar-container .title .logo-img {
-    filter: invert(1) hue-rotate(180deg) brightness(1.2);
+    filter: invert(1) hue-rotate(180deg);
+    mix-blend-mode: lighten;
 }
 
 body.dark .menubar-container .title .light-logo {
@@ -137,27 +145,23 @@ body.dark .menubar-container .title .dark-logo {
 }
 
 .menu-container {
-    display: grid;
-    grid-template-columns: 20% 1fr;
-    white-space: nowrap;
+    display: flex;
     align-items: center;
-    align-items: center;
-    justify-content: center;
-    width: calc(100% - 30px);
-    gap: 12px;
-    align-items: center;
+    width: calc(100% - 20px);
+    gap: 15px;
     cursor: pointer;
     text-decoration: none;
-    font-size: 18px;
-    transition: color 0.3s, background-color 0.3s, fill 0.3s;
+    transition: all 0.3s ease;
     color: var(--textColor);
-    padding: 10px 0;
-    margin: 0 10px 0 10px;
-    border-radius: 50px;
+    padding: 12px 0;
+    margin: 4px 10px;
+    border-radius: 12px;
 }
 
 .menu-container li {
-    padding-left: 20px;
+    list-style: none;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 .app.active .menu-container {
@@ -183,28 +187,43 @@ body.dark .menubar-container .title .dark-logo {
     box-sizing: content-box;
 }
 
-.app.active .menu-container#active .icon {
-    background-color: #e6e6e6;
+.app.active .menu-container.active .icon {
+    background-color: color-mix(in srgb, var(--userAccentColor, #1479FF), transparent 85%);
     border-radius: 50%;
 }
 
 .menu-container .icon {
-    width: 25px;
-    height: 25px;
+    width: 24px;
+    height: 24px;
     background: transparent;
-    fill: #000;
+    fill: currentColor;
     transition: 0.3s;
-    margin-left: 35px;
+    margin-left: 20px;
+    flex-shrink: 0;
 }
 
 .menu-container:hover .icon {
     fill: #000;
 }
 
-.menu-container#active .icon {
-    fill: #000;
+.menu-container.active .icon {
+    fill: var(--userAccentColor, #1479FF);
     background: transparent;
     box-shadow: none;
+}
+
+
+
+.menubar-footer {
+    margin-top: auto;
+    width: 100%;
+    padding: 10px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+    /* Increased visibility */
+}
+
+body.dark .menubar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .menu-container:hover {
@@ -213,8 +232,22 @@ body.dark .menubar-container .title .dark-logo {
     border-radius: 50px;
 }
 
-.menu-container#active {
-    color: #1479FF;
+.menu-container:hover .icon {
+    fill: currentColor;
+}
+
+.menu-container.logout-btn:hover {
+    color: #000;
+    /* Standard hover color */
+    background-color: #e6e6e6;
+}
+
+.menu-container.logout-btn:hover .icon {
+    stroke: currentColor;
+}
+
+.menu-container.active {
+    color: var(--userAccentColor, #1479FF);
     font-weight: bold;
 }
 
@@ -233,26 +266,27 @@ body.dark .menu-container:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-body.dark .menu-container#active {
-    color: var(--accentColor);
+/* Dark Mode Active State */
+body.dark .menu-container.active {
+    color: var(--userAccentColor, #1479FF);
 }
 
 body.dark .menu-container .icon {
     background: transparent;
-    fill: var(--accentColor);
+    fill: var(--accentColor, #2ec4b6);
 }
 
-body.dark .menu-container#active .icon {
+body.dark .menu-container.active .icon {
     background: transparent;
-    fill: var(--accentColor);
+    fill: var(--userAccentColor, #1479FF);
     border-radius: 0;
     box-shadow: none;
 }
 
-body.dark .app.active .menu-container#active .icon,
-.dark .app.active .menu-container#active .icon {
-    background-color: rgba(20, 121, 255, 0.2);
-    fill: var(--accentColor);
+.app.active .menu-container.active .icon,
+body.dark .app.active .menu-container.active .icon {
+    background-color: color-mix(in srgb, var(--userAccentColor, #1479FF), transparent 80%);
+    fill: var(--userAccentColor, #1479FF);
     border-radius: 50%;
 }
 
@@ -304,4 +338,77 @@ body.dark .app.active .menu-container#active .icon,
     .menu-container li {
         margin-left: 25px;
     }
+}
+
+/* Custom Tooltip for toggle-icon-wrapper */
+.toggle-icon-wrapper[data-tooltip] {
+    position: relative;
+}
+
+.toggle-icon-wrapper[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 10px);
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.01em;
+}
+
+.toggle-icon-wrapper[data-tooltip]:hover::after {
+    opacity: 1;
+}
+
+/* When sidebar is collapsed, show tooltip to the right */
+.app.active .toggle-icon-wrapper[data-tooltip]::after {
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Center toggle icon when sidebar is collapsed */
+.app.active .toggle-menu {
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+/* Menu item tooltips - only visible when sidebar is collapsed */
+.app.active .menu-container[data-tooltip] {
+    position: relative;
+}
+
+.app.active .menu-container[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.01em;
+}
+
+.app.active .menu-container[data-tooltip]:hover::after {
+    opacity: 1;
 }

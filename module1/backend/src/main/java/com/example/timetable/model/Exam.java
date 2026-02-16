@@ -27,7 +27,8 @@ public class Exam {
 
     public enum ExamStatus {
         DRAFT,
-        PUBLISHED
+        PUBLISHED,
+        DELETED
     }
 
     // Constructors

@@ -25,11 +25,11 @@ public class Subject {
         this.name = name;
     }
 
-    public Integer getSem() {
+    public Integer getSemester() {
         return semester;
     }
 
-    public void setSem(Integer semester) {
+    public void setSemester(Integer semester) {
         this.semester = semester;
     }
 

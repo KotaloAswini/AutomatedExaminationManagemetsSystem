@@ -53,7 +53,7 @@ export const AlertProvider = ({ children }) => {
 
     const autoCloseAlert = useMemo(() => deboucer(() => {
         hideAlert();
-    }, 5000), [deboucer]);
+    }, 2000), [deboucer]);
 
     return (
         <AlertContext.Provider value={{ alert, showAlert, hideAlert, showWarning, showSuccess, showError }}>

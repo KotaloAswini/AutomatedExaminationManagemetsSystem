@@ -1,7 +1,5 @@
 package com.example.timetable;
 
-import com.example.timetable.model.TimeTableStructure;
-import com.example.timetable.repository.TimeTableStructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -10,22 +8,19 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
-    private TimeTableStructureRepository repository;
+    private com.example.timetable.repository.UserRepository userRepository;
 
     @Override
     public void run(String... args) throws Exception {
         try {
-            if (repository.count() == 0) {
-                TimeTableStructure structure = new TimeTableStructure();
-                structure.setSemesterCount(4);
-                structure.setDayCount(5);
-                structure.setPeriodCount(9);
-                structure.setBreaksPerSemesterJson("[[4,5],[5],[5],[5]]");
-                structure.setSectionsPerSemesterJson("[1,1,1,1]");
-                repository.save(structure);
-                System.out.println("✓ Default timetable structure initialized in MongoDB");
-            } else {
-                System.out.println("✓ Connected to MongoDB - existing data found");
+            // Seed a test user for Module 1 ONLY
+            if (userRepository.count() == 0) {
+                com.example.timetable.model.User user = new com.example.timetable.model.User();
+                user.setUsername("admin");
+                user.setEmail("test@test.com");
+                user.setPassword("admin123");
+                userRepository.save(user);
+                System.out.println("✓ Module 1: Default test user created (admin / test@test.com)");
             }
         } catch (Exception e) {
             System.out.println("⚠ MongoDB not connected. App will work without database persistence.");

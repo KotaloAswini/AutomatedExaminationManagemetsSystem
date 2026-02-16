@@ -45,14 +45,17 @@ export async function scheduleExam(
             body: JSON.stringify(exam)
         });
 
+
         if (!response.ok) {
             const error = await response.json();
+            console.error("Schedule failed:", error);
             throw new Error(error.error || 'Failed to schedule');
         }
 
         const data = await response.json();
         onSuccess(data);
     } catch (error) {
+        console.error("Schedule error (catch):", error);
         onError(error instanceof Error ? error.message : 'Failed to schedule exam');
     }
 }
@@ -199,7 +202,7 @@ export function generatePrintableHTML(exams, subjects, title) {
 
     // Helper to get subject code
     const getSubjectCode = (courseName, semester) => {
-        const subject = subjects.find(s => s.name === courseName && s.sem === semester);
+        const subject = subjects.find(s => s.name === courseName && s.semester === semester);
         return subject ? subject.subjectCode : 'N/A';
     };
 

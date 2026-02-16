@@ -32,6 +32,7 @@ public class ExamController {
     // Schedule a new exam
     @PostMapping
     public ResponseEntity<?> scheduleExam(@RequestBody ExamRequest request) {
+        System.out.println("Module 1: POST request to schedule exam for course: " + request.courseName);
         try {
             Exam exam = new Exam();
             exam.setSemester(request.semester);
@@ -48,8 +49,11 @@ public class ExamController {
             exam.setExamType(request.examType);
 
             Exam saved = examService.scheduleExam(exam);
+            System.out.println("✓ Module 1: Exam scheduled: " + saved.getId());
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
+            System.err.println("⚠ Module 1 Error scheduling exam: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

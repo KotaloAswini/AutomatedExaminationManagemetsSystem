@@ -1,11 +1,12 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+﻿import { memo, useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Trash from '../../Icons/Trash';
 import EditIcon from '../../Icons/Edit';
 import SearchIcon from '../../Icons/Search';
 import ExamTimetableIcon from '../../Icons/ExamTimetableIcon';
 import CrossIcon from '../../Icons/Cross';
-import ExamPaperIcon from '../../Icons/ExamPaperIcon';
+import CalendarPlus from '../../Icons/CalendarPlus';
+import RefreshIcon from '../../Icons/Refresh';
 import '../../Style/Pages/ExamTimetablePage.css';
 import { useAlert } from '../../Components/AlertContextProvider';
 import { useConfirm } from '../../Components/ConfirmContextProvider';
@@ -23,13 +24,7 @@ import {
 import { checkDbConnection } from '../../Script/HealthFetcher';
 import { getSubjectsDetailsList, saveSubject } from '../../Script/SubjectsDataFetcher';
 
-const TIME_SLOTS = [
-    { label: '9:30 AM - 11:00 AM', start: '09:30', end: '11:00', duration: 90 },
-    { label: '1:30 PM - 3:00 PM', start: '13:30', end: '15:00', duration: 90 }
-];
-
-const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
-const DEPARTMENTS = ['CSE', 'AE', 'CE', 'ECE', 'EEE', 'ME', 'ISE', 'AI&DS', 'AI&ML'];
+import { TIME_SLOTS, SEMESTERS, DEPARTMENTS } from '../../Script/Constants';
 
 
 
@@ -76,35 +71,27 @@ function ExamTimetablePage() {
     const { showErrorConfirm } = useConfirm();
     const location = useLocation();
 
-    // Load functions memoized
-    const loadExams = useCallback(async () => {
-        const data = await getExams(filterSemester, filterDepartment || undefined, 'DRAFT');
-        setExams(data);
-    }, [filterSemester, filterDepartment]);
-
-    const loadConflicts = useCallback(async () => {
-        const result = await checkConflicts(filterSemester, filterDepartment || undefined);
-        setConflicts(result.conflicts);
-        setIsConflictFree(result.conflictFree);
-    }, [filterSemester, filterDepartment]);
-
     // Load initial data
     useEffect(() => {
         loadExams();
         getSubjectsDetailsList(data => setSubjectsDetails(data));
-    }, [loadExams]);
+    }, []);
 
     // Check for edit state from navigation
     useEffect(() => {
         if (location.state?.editExam) {
             handleEditExam(location.state.editExam);
+            // Clear state to prevent re-triggering on refresh? 
+            // Actually router state persists, but handleEditExam just sets state, so it's idempotent-ish.
+            // Ideally we should clear it, but modifying history might be overkill. 
+            // Proceeding with just population.
         }
     }, [location.state]);
 
     // Reload when filters change
     useEffect(() => {
         loadExams();
-    }, [loadExams]);
+    }, [filterSemester, filterDepartment]);
 
     useEffect(() => {
         localStorage.setItem('testCoordinator', testCoordinator);
@@ -112,13 +99,19 @@ function ExamTimetablePage() {
 
     // Check conflicts whenever exams change
     useEffect(() => {
-        if (exams.length > 0) {
-            loadConflicts();
-        } else {
-            setConflicts([]);
-            setIsConflictFree(true);
-        }
-    }, [exams, loadConflicts]);
+        loadConflicts();
+    }, [exams]);
+
+    const loadExams = async () => {
+        const data = await getExams(filterSemester, filterDepartment || undefined, 'DRAFT');
+        setExams(data);
+    };
+
+    const loadConflicts = async () => {
+        const result = await checkConflicts(filterSemester, filterDepartment || undefined);
+        setConflicts(result.conflicts);
+        setIsConflictFree(result.conflictFree);
+    };
 
     const handleScheduleExam = useCallback(async () => {
         const isConnected = await checkDbConnection();
@@ -127,47 +120,22 @@ function ExamTimetablePage() {
             return;
         }
 
-        if (!selectedCourse || !examDate) {
+        if (!selectedCourse || !examDate || !testCoordinator) {
             showError('Please fill all required fields');
             return;
         }
 
-        // 1. Check for Duplicate Subject (Same Course, Same Exam Type)
-        const duplicateSubject = exams.find(e =>
-            e.semester === selectedSemester &&
-            e.department === selectedDepartment &&
-            e.courseName === selectedCourse &&
-            e.examType === examType
-        );
-
-        if (duplicateSubject) {
-            showError(`Subject '${selectedCourse}' is already scheduled for ${examType}.`);
-            return;
-        }
-
-
-
-        // Check if there are already exams for this date, semester, and department
-        const examsOnSameDay = exams.filter(exam =>
+        // Check if there are already 2 exams of the SAME TYPE for this date, semester, and department
+        const examsOfSameTypeOnDay = exams.filter(exam =>
             exam.examDate === examDate &&
             exam.semester === selectedSemester &&
-            exam.department === selectedDepartment
+            exam.department === selectedDepartment &&
+            exam.examType?.toLowerCase() === examType?.toLowerCase()
         );
 
-        // 3. Daily Limit Validation
-        if (examType && examType.includes('Retest')) {
-            // Specific Limit for Retest: Only 1 Retest of the same type per day
-            const retestsOnSameDay = examsOnSameDay.filter(e => e.examType === examType);
-            if (retestsOnSameDay.length >= 1) {
-                showError(`Only 1 exam of type '${examType}' is allowed per day for ${selectedDepartment} SEM ${selectedSemester}.`);
-                return;
-            }
-        } else {
-            // General Limit for Regular Exams (Max 2 total per day)
-            if (examsOnSameDay.length >= 2) {
-                showError(`Maximum 2 subjects allowed per day for ${selectedDepartment} SEM ${selectedSemester}. This date already has ${examsOnSameDay.length} exam(s) scheduled.`);
-                return;
-            }
+        if (examsOfSameTypeOnDay.length >= 2) {
+            showError(`Daily limit reached: Only 2 ${examType} exams allowed per day for ${selectedDepartment} Sem ${selectedSemester}.`);
+            return;
         }
 
         const slot = TIME_SLOTS[selectedTimeSlot];
@@ -210,7 +178,7 @@ function ExamTimetablePage() {
             return;
         }
 
-        if (!examDate) {
+        if (!examDate || !testCoordinator) {
             showError('Please fill all required fields');
             return;
         }
@@ -239,26 +207,24 @@ function ExamTimetablePage() {
             },
             showError
         );
-    }, [editingExam, examDate, selectedTimeSlot, hallId, showError, showSuccess, loadExams, selectedSemester, selectedDepartment, selectedCourse, testCoordinator, examType]);
+    }, [editingExam, examDate, selectedTimeSlot, hallId, showError, showSuccess, loadExams]);
 
     const handleDeleteExam = useCallback((id) => {
-        showErrorConfirm('⚠️ Are you sure you want to delete this exam permanently?', () => {
-            setLoading(true);
+
+        showErrorConfirm('Permanently delete this exam?', () => {
             deleteExam(
                 id,
                 () => {
                     showSuccess('Exam deleted successfully');
-                    loadExams(); // Reload from server to be sure
-                    loadConflicts(); // Re-check conflicts immediately
-                    setLoading(false);
+                    loadExams();
                 },
                 (msg) => {
-                    showError(msg);
-                    setLoading(false);
+                    console.error('Delete failed:', msg);
+                    showError('Failed to delete exam: ' + msg);
                 }
             );
         });
-    }, [showErrorConfirm, showSuccess, loadExams, loadConflicts, showError]);
+    }, [showError, showSuccess, showErrorConfirm, loadExams]);
 
     const handleEditExam = (exam) => {
         setEditingExam(exam);
@@ -295,17 +261,21 @@ function ExamTimetablePage() {
         autoResolveConflicts(
             filterSemester,
             filterDepartment || undefined,
-            (data) => {
+            async (data) => {
                 showSuccess(data.message);
-                loadExams();
-                setLoading(false);
+                await loadExams();
+                // Add small delay to ensure database changes are fully committed
+                setTimeout(async () => {
+                    await loadConflicts();
+                    setLoading(false);
+                }, 300);
             },
             (msg) => {
                 showError(msg);
                 setLoading(false);
             }
         );
-    }, [filterSemester, filterDepartment, showError, showSuccess, loadExams]);
+    }, [filterSemester, filterDepartment, showError, showSuccess, loadExams, loadConflicts]);
 
     const handlePublish = useCallback(async () => {
         const isConnected = await checkDbConnection();
@@ -340,8 +310,8 @@ function ExamTimetablePage() {
     // Get courses for selected department and semester
     // Strict filtering - only show courses that match BOTH semester AND department
     const coursesForSemester = subjectsDetails.filter(s =>
-        s.sem === selectedSemester &&
-        s.department === selectedDepartment
+        s.semester === selectedSemester &&
+        (!s.department || s.department === selectedDepartment)
     );
 
     const handleCourseChange = (e) => {
@@ -367,20 +337,18 @@ function ExamTimetablePage() {
         const newSub = {
             name: newSubjectName,
             subjectCode: newSubjectCode,
-            sem: selectedSemester,
+            semester: selectedSemester,
             department: selectedDepartment,
             subjectType: newSubjectType
         };
 
         setLoading(true);
         saveSubject(
-            newSubjectName,
             newSub,
             () => {
                 showSuccess("Subject added successfully");
-                // Refresh subjects
-                getSubjectsDetailsList(data => setSubjectsDetails(data));
-                setSelectedCourse(newSubjectName); // Auto-select the new subject
+                setSubjectsDetails(prev => [...prev, newSub]);
+                setSelectedCourse(newSubjectName);
                 setShowAddSubjectModal(false);
                 setLoading(false);
             },
@@ -391,42 +359,11 @@ function ExamTimetablePage() {
         );
     };
 
-    // Filter exams based on search query (by name, department, or date)
-    const filteredExams = exams.filter(exam => {
-        const query = searchQuery.trim().toLowerCase();
-        if (!query) return true;
-        // Match by course name
-        if (exam.courseName && exam.courseName.toLowerCase().includes(query)) return true;
-        // Match by department
-        if (exam.department && exam.department.toLowerCase().includes(query)) return true;
-        // Match by date in any format
-        if (exam.examDate) {
-            const dateStr = String(exam.examDate); // ensure it's a string
-            // Match raw API format "2026-01-29"
-            if (dateStr.includes(query)) return true;
-            // Convert to dd-mm-yyyy for matching (as displayed in table)
-            const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                const ddmmyyyy = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                if (ddmmyyyy.includes(query)) return true;
-            }
-            // Match human-readable formats (e.g. "Feb 11", "Wed", "January", "Wednesday")
-            try {
-                const d = new Date(dateStr + 'T00:00:00');
-                if (!isNaN(d.getTime())) {
-                    const long = d.toLocaleDateString('en-US', {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    }).toLowerCase();
-                    if (long.includes(query)) return true;
-                    const short = d.toLocaleDateString('en-US', {
-                        weekday: 'short', month: 'short', day: 'numeric'
-                    }).toLowerCase();
-                    if (short.includes(query)) return true;
-                }
-            } catch (e) { /* ignore parse errors */ }
-        }
-        return false;
-    });
+    // Filter exams based on search query
+    const filteredExams = exams.filter(exam =>
+        exam.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (exam.department && exam.department.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
     // Group exams by date for display
     const examsByDate = filteredExams.reduce((acc, exam) => {
@@ -471,7 +408,7 @@ function ExamTimetablePage() {
                         {editingExam ? (
                             <><EditIcon width={22} height={22} /> Edit Exam</>
                         ) : (
-                            <><ExamPaperIcon size={22} /> Schedule Exam</>
+                            <><CalendarPlus width={22} height={22} /> Schedule Exam</>
                         )}
                     </h2>
 
@@ -488,7 +425,7 @@ function ExamTimetablePage() {
                             {showDeptDropdown && (
                                 <>
                                     <div
-                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }}
                                         onClick={() => setShowDeptDropdown(false)}
                                     />
                                     <div className="custom-select-options">
@@ -523,7 +460,7 @@ function ExamTimetablePage() {
                             {showSemDropdown && (
                                 <>
                                     <div
-                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }}
                                         onClick={() => setShowSemDropdown(false)}
                                     />
                                     <div className="custom-select-options">
@@ -565,7 +502,7 @@ function ExamTimetablePage() {
                             {showCourseDropdown && (
                                 <>
                                     <div
-                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }}
                                         onClick={() => setShowCourseDropdown(false)}
                                     />
                                     <div className="custom-select-options">
@@ -618,7 +555,7 @@ function ExamTimetablePage() {
                             {showExamTypeDropdown && (
                                 <>
                                     <div
-                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }}
                                         onClick={() => setShowExamTypeDropdown(false)}
                                     />
                                     <div className="custom-select-options">
@@ -687,7 +624,7 @@ function ExamTimetablePage() {
                             {showTimeSlotDropdown && (
                                 <>
                                     <div
-                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }}
                                         onClick={() => setShowTimeSlotDropdown(false)}
                                     />
                                     <div className="custom-select-options">
@@ -710,7 +647,7 @@ function ExamTimetablePage() {
                     </div>
 
                     <div className='form-group'>
-                        <label>Test Coordinator</label>
+                        <label>Test Coordinator *</label>
                         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                             <input
                                 type="text"
@@ -726,7 +663,7 @@ function ExamTimetablePage() {
                                         position: 'absolute',
                                         right: '0.5rem',
                                         cursor: 'pointer',
-                                        opacity: 0.5,
+                                        opacity: .5,
                                         display: 'flex',
                                         alignItems: 'center',
                                         padding: '4px'
@@ -755,7 +692,7 @@ function ExamTimetablePage() {
                         {editingExam ? (
                             <>
                                 <button className='btn primary' onClick={handleUpdateExam}>
-                                    ✓ Update
+                                    {String.fromCodePoint(0x2714)} Update
                                 </button>
                                 <button className='btn secondary' onClick={resetForm}>
                                     Cancel
@@ -780,7 +717,7 @@ function ExamTimetablePage() {
                             >
                                 <option value="">All Semesters</option>
                                 {SEMESTERS.map(sem => (
-                                    <option key={sem} value={sem}>SEM {sem}</option>
+                                    <option key={sem} value={sem}>Sem {sem}</option>
                                 ))}
                             </select>
                             <select
@@ -794,52 +731,38 @@ function ExamTimetablePage() {
                             </select>
                         </div>
                         <div className='status-badge' data-status={isConflictFree ? 'ok' : 'conflict'}>
-                            {isConflictFree ? '✓ No Conflicts' : `⚠ ${conflicts.length} Conflict(s)`}
+                            {isConflictFree ? `${String.fromCodePoint(0x2714)} No Conflicts` : `${String.fromCodePoint(0x26A0)} ${conflicts.length} Conflict(s)`}
                         </div>
                     </div>
 
                     {/* Conflict Alert */}
                     {!isConflictFree && (
                         <div className='conflict-alert'>
-                            <h3>⚠️ Conflicts Detected</h3>
+                            <h3>{String.fromCodePoint(0x26A0, 0xFE0F)} Conflicts Detected</h3>
                             <ul>
-                                {conflicts.slice(0, 5).map((c, idx) => {
-                                    const exam1 = exams.find(e => e.id === c.examId1);
-                                    const exam2 = exams.find(e => e.id === c.examId2);
+                                {conflicts.map((c, idx) => {
+                                    const typeLabels = {
+                                        'STUDENT': 'Time Conflict',
+                                        'HALL': 'Hall Conflict',
+                                        'FACULTY': 'Faculty Conflict',
+                                        'SAME_DAY': 'Same Day',
+                                        'MAX_LOAD': 'Overloaded',
+                                        'DAILY_LIMIT': 'Daily Limit'
+                                    };
+                                    const label = typeLabels[c.type] || c.type;
 
                                     return (
                                         <li key={idx} className={`conflict-${c.type.toLowerCase()}`}>
                                             <div>
-                                                <span className='conflict-type'>{c.type}</span>
+                                                <span className='conflict-type'>{label}</span>
                                                 {c.message}
                                             </div>
-                                            <div className="conflict-actions" style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                                {exam1 && (
-                                                    <button
-                                                        className='btn warning'
-                                                        style={{ paddingTop: '2px', paddingBottom: '2px', fontSize: '12px' }}
-                                                        onClick={() => handleDeleteExam(c.examId1)}
-                                                    >
-                                                        Delete '{exam1.courseName}'
-                                                    </button>
-                                                )}
-                                                {exam2 && (
-                                                    <button
-                                                        className='btn warning'
-                                                        style={{ paddingTop: '2px', paddingBottom: '2px', fontSize: '12px' }}
-                                                        onClick={() => handleDeleteExam(c.examId2)}
-                                                    >
-                                                        Delete '{exam2.courseName}'
-                                                    </button>
-                                                )}
-                                            </div>
                                         </li>
-                                    )
+                                    );
                                 })}
-                                {conflicts.length > 5 && <li>...and {conflicts.length - 5} more</li>}
                             </ul>
                             <button className='btn warning' onClick={handleAutoResolve}>
-                                🔄 Auto-Resolve Conflicts
+                                <RefreshIcon size={18} strokeWidth={2.5} /> Auto-Resolve Conflicts
                             </button>
                         </div>
                     )}
@@ -872,10 +795,10 @@ function ExamTimetablePage() {
                                                     <td rowSpan={dateExams.length} className='date-cell'>
                                                         {(() => {
                                                             const d = new Date(date);
-                                                            const day = String(d.getDate()).padStart(2, '0');
-                                                            const month = String(d.getMonth() + 1).padStart(2, '0');
-                                                            const year = d.getFullYear();
-                                                            return `${day}-${month}-${year}`;
+                                                            const dd = String(d.getDate()).padStart(2, '0');
+                                                            const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                                            const yyyy = d.getFullYear();
+                                                            return `${dd}-${mm}-${yyyy}`;
                                                         })()}
                                                     </td>
                                                 )}
@@ -903,7 +826,6 @@ function ExamTimetablePage() {
                                                             <button
                                                                 className='btn-icon delete'
                                                                 onClick={() => {
-                                                                    console.log('TRASH BUTTON CLICKED!', exam.id);
                                                                     handleDeleteExam(exam.id);
                                                                 }}
                                                                 title="Delete"
@@ -921,7 +843,7 @@ function ExamTimetablePage() {
                         </table>
                         {exams.length === 0 && (
                             <div className='empty-state'>
-                                <p>📋 No exams scheduled yet.</p>
+                                <p>{String.fromCodePoint(0x1F4CB)} No exams scheduled yet.</p>
                                 <p>Use the form to add exams.</p>
                             </div>
                         )}
@@ -935,7 +857,7 @@ function ExamTimetablePage() {
                             onClick={handlePublish}
                             disabled={exams.length === 0 || !isConflictFree || exams.every(e => e.status === 'PUBLISHED')}
                         >
-                            ✓ Publish Timetable
+                            {String.fromCodePoint(0x2714)} Publish Timetable
                         </button>
                     </div>
                 </div>
@@ -962,7 +884,7 @@ function ExamTimetablePage() {
                             <input
                                 type="text"
                                 value={newSubjectCode}
-                                onChange={e => setNewSubjectCode(e.target.value)}
+                                onChange={e => setNewSubjectCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                                 placeholder="e.g. CS501"
                             />
                         </div>
@@ -979,3 +901,4 @@ function ExamTimetablePage() {
 }
 
 export default memo(ExamTimetablePage);
+

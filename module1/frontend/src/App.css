@@ -9,7 +9,8 @@ body.dark {
 	--menubarIconContainerColor: rgba(255, 255, 255, 0.1);
 	--inputPlaceholderColor: rgba(255, 255, 255, 0.6);
 	--tagIconColor: rgba(255, 255, 255, 0.7);
-	--accentColor: #60a5fa;
+	--accentColor: var(--userAccentColor, #60a5fa);
+	--edu-blue: var(--userAccentColor, #60a5fa);
 
 	--tableHeaderColor: #1e293b;
 	--greenText: #4ade80;
@@ -55,7 +56,8 @@ body.light {
 	--menubarIconContainerColor: #f1f5f9;
 	--inputPlaceholderColor: #94a3b8;
 	--tagIconColor: rgba(0, 0, 0, 0.5);
-	--accentColor: #2563eb;
+	--accentColor: var(--userAccentColor, #2563eb);
+	--edu-blue: var(--userAccentColor, #2563eb);
 
 	--tableHeaderColor: #f8fafc;
 	--greenText: #16a34a;
@@ -67,7 +69,6 @@ body.light {
 	--edu-slate: #64748b;
 	--edu-light: #f8fafc;
 	--edu-border: #e2e8f0;
-	--edu-blue: #2563eb;
 	--inputBg: #ffffff;
 	--hoverColor: #f1f5f9;
 }

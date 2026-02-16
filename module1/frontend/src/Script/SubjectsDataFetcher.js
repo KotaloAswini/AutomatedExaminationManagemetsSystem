@@ -26,14 +26,12 @@ export const getSubjectsDetailsList = async (onSuccess = () => { }) => {
     }
 }
 
-export const saveSubject = async (
-    subjectName,
-    subjectDetails,
-    onSuccess = () => { },
-    onFailed = () => { }
-) => {
+// Save new subject
+export const saveSubject = async (subjectDetails, onSuccess, onFailed) => {
     try {
-        const response = await fetch(`${url}/io/subjects/${subjectName}`, {
+        const subjectName = subjectDetails.name;
+        // The backend expects PUT at /io/subjects/{name} with body
+        const response = await fetch(`${url}/io/subjects/${encodeURIComponent(subjectName)}`, {
             method: "PUT",
             headers: {
                 'content-type': 'application/json',
@@ -41,17 +39,20 @@ export const saveSubject = async (
             },
             body: JSON.stringify(subjectDetails)
         });
-        if (response.status === 200) {
+
+
+        if (response.status === 200 || response.status === 201) {
             onSuccess();
             return subjectName;
         } else {
             const textResponse = await response.text();
             console.error("Error saving subject details:", textResponse);
-            onFailed(textResponse);
+            onFailed(textResponse || "Server returned " + response.status);
             return null;
         }
     } catch (error) {
-        console.error("Invalid subject data or unable to send request:", subjectDetails);
+        console.error("Invalid subject data or unable to send request:", error);
+        onFailed(error.message || "Network or Server Error");
         throw error;
     }
 }

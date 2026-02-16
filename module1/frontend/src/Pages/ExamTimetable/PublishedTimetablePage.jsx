@@ -18,8 +18,7 @@ import ExamTimetableIcon from '../../Icons/ExamTimetableIcon';
 import Printer from '../../Icons/Printer';
 import Download from '../../Icons/Download';
 
-const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
-const DEPARTMENTS = ['CSE', 'AE', 'CE', 'ECE', 'EEE', 'ME', 'ISE', 'AI&DS', 'AI&ML'];
+import { TIME_SLOTS, SEMESTERS, DEPARTMENTS } from '../../Script/Constants';
 
 function PublishedTimetablePage() {
     const { showError, showSuccess } = useAlert();
@@ -40,6 +39,7 @@ function PublishedTimetablePage() {
     const [editDate, setEditDate] = useState('');
     const [editStartTime, setEditStartTime] = useState('');
     const [editEndTime, setEditEndTime] = useState('');
+    const [editTimeSlot, setEditTimeSlot] = useState(0);
     const [editExamType, setEditExamType] = useState('MSE I');
     const [editTestCoordinator, setEditTestCoordinator] = useState('');
     const [subjectsDetails, setSubjectsDetails] = useState([]);
@@ -152,7 +152,7 @@ function PublishedTimetablePage() {
     };
 
     const handleDelete = (id) => {
-        showErrorConfirm('⚠️ Permanently delete this exam?', () => {
+        showErrorConfirm('Permanently delete this exam?', () => {
             setLoading(true);
             deleteExam(
                 id,
@@ -168,23 +168,34 @@ function PublishedTimetablePage() {
         });
     };
 
+
     const handleEdit = (exam) => {
-        setEditingExam(exam);
-        setEditDepartment(exam.department || 'CSE');
-        setEditSemester(exam.semester);
-        setEditCourse(exam.courseName);
-        setEditDate(exam.examDate);
-        setEditStartTime(exam.startTime);
-        setEditEndTime(exam.endTime);
-        setEditExamType(exam.examType || 'MSE I');
-        setEditTestCoordinator(exam.testCoordinator || '');
-        setShowEditModal(true);
+        showErrorConfirm(
+            'Edit published exam? May affect schedules.',
+            () => {
+                setEditingExam(exam);
+                setEditDepartment(exam.department || 'CSE');
+                setEditSemester(exam.semester);
+                setEditCourse(exam.courseName);
+                setEditDate(exam.examDate);
+                setEditStartTime(exam.startTime);
+                setEditEndTime(exam.endTime);
+                setEditExamType(exam.examType || 'MSE I');
+                setEditTestCoordinator(exam.testCoordinator || '');
+
+                // Find matching time slot
+                const slotIdx = TIME_SLOTS.findIndex(s => s.start === exam.startTime);
+                setEditTimeSlot(slotIdx >= 0 ? slotIdx : 0);
+
+                setShowEditModal(true);
+            }
+        );
     };
 
     const handleSaveEdit = async () => {
         if (!editingExam) return;
 
-        if (!editDepartment || !editSemester || !editCourse || !editDate || !editStartTime || !editEndTime) {
+        if (!editDepartment || !editSemester || !editCourse || !editDate || !editStartTime || !editEndTime || !editTestCoordinator) {
             showError('Please fill all required fields');
             return;
         }
@@ -441,7 +452,6 @@ function PublishedTimetablePage() {
                                 <EditIcon width={24} height={24} />
                                 Edit Exam
                             </h2>
-                            <button className='modal-close' onClick={handleCancelEdit}>×</button>
                         </div>
                         <div className='modal-body'>
                             <div className='form-row'>
@@ -481,11 +491,11 @@ function PublishedTimetablePage() {
                                 >
                                     <option value="">Select a course</option>
                                     {/* Show current course if it exists and isn't in the filtered list */}
-                                    {editCourse && !subjectsDetails.some(s => s.name === editCourse && s.sem === editSemester) && (
+                                    {editCourse && !subjectsDetails.some(s => s.name === editCourse && s.semester === editSemester) && (
                                         <option value={editCourse}>{editCourse} (Current)</option>
                                     )}
                                     {subjectsDetails
-                                        .filter(s => s.sem === editSemester)
+                                        .filter(s => s.semester === editSemester)
                                         .map(subject => (
                                             <option key={subject.name} value={subject.name}>
                                                 {subject.name} ({subject.subjectCode})
@@ -493,13 +503,13 @@ function PublishedTimetablePage() {
                                         ))
                                     }
                                     {/* Fallback: show all subjects if none match the semester */}
-                                    {subjectsDetails.filter(s => s.sem === editSemester).length === 0 &&
+                                    {subjectsDetails.filter(s => s.semester === editSemester).length === 0 &&
                                         subjectsDetails.length > 0 && (
                                             <>
                                                 <option disabled>─── All Subjects ───</option>
                                                 {subjectsDetails.map(subject => (
                                                     <option key={subject.name} value={subject.name}>
-                                                        {subject.name} ({subject.subjectCode}) - SEM {subject.sem}
+                                                        {subject.name} ({subject.subjectCode}) - SEM {subject.semester}
                                                     </option>
                                                 ))}
                                             </>
@@ -535,27 +545,26 @@ function PublishedTimetablePage() {
 
                             <div className='form-row'>
                                 <div className='form-group'>
-                                    <label>Start Time *</label>
-                                    <input
-                                        type="time"
-                                        value={editStartTime}
-                                        onChange={(e) => setEditStartTime(e.target.value)}
-                                        className='form-input'
-                                    />
+                                    <label>Time Slot *</label>
+                                    <select
+                                        value={editTimeSlot}
+                                        onChange={(e) => {
+                                            const idx = Number(e.target.value);
+                                            setEditTimeSlot(idx);
+                                            setEditStartTime(TIME_SLOTS[idx].start);
+                                            setEditEndTime(TIME_SLOTS[idx].end);
+                                        }}
+                                        className='form-select'
+                                    >
+                                        {TIME_SLOTS.map((slot, idx) => (
+                                            <option key={idx} value={idx}>
+                                                {slot.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
-
                                 <div className='form-group'>
-                                    <label>End Time *</label>
-                                    <input
-                                        type="time"
-                                        value={editEndTime}
-                                        onChange={(e) => setEditEndTime(e.target.value)}
-                                        className='form-input'
-                                    />
-                                </div>
-
-                                <div className='form-group'>
-                                    <label>Test Coordinator</label>
+                                    <label>Test Coordinator *</label>
                                     <input
                                         type="text"
                                         value={editTestCoordinator}
@@ -616,33 +625,24 @@ function PublishedTimetablePage() {
                     font-style: italic;
                 }
 
-                /* Edit Modal Styles */
-                .modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                    animation: fadeIn 0.2s ease;
-                }
-
+                /* Professional Adaptive UI (Light Default, Dark Override) */
+                
+                /* LIGHT MODE (Default) */
                 .modal-content {
-                    background: var(--containerColor, #fff);
+                    background: #ffffff;
                     border-radius: 12px;
                     width: 90%;
-                    max-width: 500px;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-                    animation: slideUp 0.3s ease;
+                    max-width: 600px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+                    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    color: #24292f;
+                    border: 1px solid #d0d7de;
+                    font-family: 'Segoe UI', system-ui, sans-serif;
                 }
 
                 .modal-header {
                     padding: 1.5rem;
-                    border-bottom: 1px solid var(--borderColor, #e0e0e0);
+                    border-bottom: 1px solid #d0d7de;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -651,27 +651,11 @@ function PublishedTimetablePage() {
                 .modal-header h2 {
                     margin: 0;
                     font-size: 1.5rem;
-                    color: var(--textColor, #333);
-                }
-
-                .modal-close {
-                    background: none;
-                    border: none;
-                    font-size: 2rem;
-                    cursor: pointer;
-                    color: var(--textColor2, #666);
-                    width: 32px;
-                    height: 32px;
+                    font-weight: 700;
+                    color: #24292f;
                     display: flex;
                     align-items: center;
-                    justify-content: center;
-                    border-radius: 4px;
-                    transition: all 0.2s;
-                }
-
-                .modal-close:hover {
-                    background: var(--hoverColor, #f0f0f0);
-                    color: var(--textColor, #333);
+                    gap: 12px;
                 }
 
                 .modal-body {
@@ -681,49 +665,175 @@ function PublishedTimetablePage() {
                 .form-row {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
-                    gap: 1rem;
+                    gap: 1.5rem;
                 }
 
                 .form-group {
-                    margin-bottom: 1.25rem;
+                    margin-bottom: 1.5rem;
                 }
 
                 .form-group label {
                     display: block;
-                    margin-bottom: 0.5rem;
-                    font-weight: 500;
-                    color: var(--textColor, #333);
+                    margin-bottom: 0.6rem;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    color: #57606a; /* Light mode muted text */
                 }
 
                 .form-select,
                 .form-input {
                     width: 100%;
-                    padding: 0.75rem;
-                    border: 1px solid var(--borderColor, #ddd);
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    background: var(--containerColor, #fff);
-                    color: var(--textColor, #333);
-                    transition: all 0.2s;
-                }
-
-                .form-select {
-                    cursor: pointer;
+                    padding: 0.85rem 1rem;
+                    border: 1px solid #d0d7de;
+                    border-radius: 6px;
+                    font-size: 0.95rem;
+                    background: #f6f8fa; /* Light mode input bg */
+                    color: #24292f;
+                    transition: border-color 0.2s, box-shadow 0.2s;
                 }
 
                 .form-select:focus,
                 .form-input:focus {
                     outline: none;
-                    border-color: var(--primaryColor, #007bff);
-                    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+                    border-color: #0969da; /* Light mode focus blue */
+                    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+                    background: #ffffff;
+                }
+
+                .form-input[type="date"] {
+                    color-scheme: light;
                 }
 
                 .modal-footer {
                     padding: 1.5rem;
-                    border-top: 1px solid var(--borderColor, #e0e0e0);
+                    border-top: 1px solid #d0d7de;
                     display: flex;
                     justify-content: flex-end;
-                    gap: 0.75rem;
+                    gap: 1rem;
+                    background: #ffffff;
+                    border-bottom-left-radius: 12px;
+                    border-bottom-right-radius: 12px;
+                }
+                
+                /* Buttons Defaults */
+                .btn {
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    font-size: 0.95rem;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: 1px solid rgba(27, 31, 36, 0.15);
+                    box-shadow: 0 1px 0 rgba(27, 31, 36, 0.04);
+                }
+                
+                .btn.secondary {
+                    background: #f6f8fa;
+                    color: #24292f;
+                }
+                
+                .btn.secondary:hover {
+                    background: #f3f4f6;
+                    border-color: rgba(27, 31, 36, 0.15);
+                }
+                
+                .btn.primary {
+                    background: #2da44e; /* Green for primary usually, or Blue */
+                    color: #ffffff;
+                    border: 1px solid rgba(27, 31, 36, 0.15);
+                }
+                
+                .btn.primary:hover {
+                    background: #2c974b;
+                }
+
+                /* DARK MODE OVERRIDES */
+                body.dark .modal-content {
+                    background: #161b22;
+                    border-color: #30363d;
+                    color: #e6edf3;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+                }
+
+                body.dark .modal-header {
+                    border-bottom-color: #30363d;
+                }
+
+                body.dark .modal-header h2 {
+                    color: #e6edf3;
+                }
+
+                body.dark .form-group label {
+                    color: #c9d1d9;
+                }
+
+                body.dark .form-select,
+                body.dark .form-input {
+                    background: #0d1117;
+                    border-color: #30363d;
+                    color: #e6edf3;
+                }
+
+                body.dark .form-select:focus,
+                body.dark .form-input:focus {
+                    border-color: #58a6ff;
+                    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+                    background: #0d1117;
+                }
+
+                body.dark .form-input[type="date"] {
+                    /* Providing a default to ensure filter works consistently */
+                    color-scheme: normal;
+                }
+                
+                body.dark .form-input[type="date"]::-webkit-calendar-picker-indicator {
+                    filter: invert(1) brightness(1.5);
+                    cursor: pointer;
+                    opacity: 0.8;
+                    transition: opacity 0.2s;
+                }
+                
+                body.dark .form-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+                    opacity: 1;
+                }
+
+                body.dark .modal-footer {
+                    background: #161b22;
+                    border-top-color: #30363d;
+                }
+
+                /* Keep the vibrant Orange/Blue buttons for Dark Mode primarily, or adapt */
+                body.dark .btn {
+                    border: 1px solid rgba(240, 246, 252, 0.1);
+                    box-shadow: 0 0 transparent;
+                }
+                
+                body.dark .btn.secondary {
+                    background: #21262d; /* Professional Neutral Gray */
+                    color: #c9d1d9;
+                    border-color: #30363d;
+                }
+                
+                body.dark .btn.secondary:hover {
+                    background: #30363d;
+                    color: #ffffff;
+                    border-color: #8b949e;
+                    transform: none; /* Be subtle */
+                    box-shadow: none;
+                }
+                
+                body.dark .btn.primary {
+                    background: #1f6feb; /* GitHub/VS Code Blue */
+                    color: white;
+                    border-color: rgba(240, 246, 252, 0.1);
+                    font-weight: 600;
+                }
+
+                body.dark .btn.primary:hover {
+                    background: #388bfd;
+                    border-color: rgba(240, 246, 252, 0.1);
+                    transform: none;
+                    box-shadow: none;
                 }
 
                 @keyframes fadeIn {
@@ -765,7 +875,7 @@ function PublishedTimetablePage() {
                         boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
                     }}>
                         <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            🖨️ Print Timetable
+                            <Printer width={20} height={20} color="#6366f1" /> Print Timetable
                         </h3>
 
                         <div className='form-group' style={{ marginBottom: '15px' }}>
@@ -821,9 +931,9 @@ function PublishedTimetablePage() {
                             <button
                                 className='btn primary'
                                 onClick={handleConfirmPrint}
-                                style={{ padding: '10px 20px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                                style={{ padding: '10px 20px', background: '#6366f1', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                             >
-                                🖨️ Print
+                                <Printer width={16} height={16} color="white" /> Print
                             </button>
                         </div>
                     </div>

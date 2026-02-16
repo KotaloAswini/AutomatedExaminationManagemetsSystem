@@ -47,6 +47,22 @@ public class ExamService {
 
     // Schedule a new exam
     public Exam scheduleExam(Exam exam) {
+        // Enforce Max 2 Exams per day logic (Per Exam Type, Scope Department)
+        List<Exam> existing = getExams(exam.getSemester(), exam.getDepartment(), null);
+        long count = existing.stream()
+                .filter(e -> e.getExamDate().equals(exam.getExamDate())
+                        && e.getExamType().equalsIgnoreCase(exam.getExamType())
+                        // Ensure we count only exams in THIS department and semester
+                        && e.getSemester().equals(exam.getSemester())
+                        && e.getDepartment().equals(exam.getDepartment())
+                        && e.getStatus() != ExamStatus.DELETED)
+                .count();
+
+        if (count >= 2) {
+            throw new RuntimeException("Cannot schedule: Date " + exam.getExamDate() + " already has 2 exams of type "
+                    + exam.getExamType());
+        }
+
         exam.setStatus(ExamStatus.DRAFT);
         return examRepository.save(exam);
     }
@@ -55,8 +71,6 @@ public class ExamService {
     public Exam updateExam(String id, Exam updates) {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
-
-        // Allow editing published exams for corrections
 
         if (updates.getSemester() != null)
             exam.setSemester(updates.getSemester());
@@ -86,17 +100,14 @@ public class ExamService {
     public void deleteExam(String id) {
         examRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
-
-        // Allow deleting published exams
-
         examRepository.deleteById(id);
     }
 
-    // Detect all conflicts (only among DRAFT exams — published exams are already
-    // locked)
+    // Detect all conflicts
     public ConflictResult detectConflicts(Integer semester, String department) {
-        List<Exam> exams = getExams(semester, department, ExamStatus.DRAFT);
+        List<Exam> exams = getExams(semester, department, null); // Check ALL exams, not just DRAFT
         List<Conflict> conflicts = new ArrayList<>();
+        Set<String> reportedLoadKeys = new HashSet<>();
 
         for (int i = 0; i < exams.size(); i++) {
             for (int j = i + 1; j < exams.size(); j++) {
@@ -104,85 +115,63 @@ public class ExamService {
                 Exam e2 = exams.get(j);
 
                 if (e1.conflictsWith(e2)) {
-                    // Student conflict - same semester
-                    if (e1.getSemester().equals(e2.getSemester())) {
+                    // Student conflict
+                    if (e1.getSemester().equals(e2.getSemester())
+                            && e1.getExamType() != null && e1.getExamType().equalsIgnoreCase(e2.getExamType())
+                            && !e1.getCourseName().equalsIgnoreCase(e2.getCourseName())) {
                         String type1 = e1.getExamType() != null ? e1.getExamType().trim() : "";
                         String type2 = e2.getExamType() != null ? e2.getExamType().trim() : "";
 
                         conflicts.add(new Conflict(
                                 "STUDENT",
                                 String.format(
-                                        "Sem %d: [%s] %s & [%s] %s on %s",
-                                        e1.getSemester(),
-                                        type1, e1.getCourseName(),
-                                        type2, e2.getCourseName(),
-                                        e1.getExamDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))),
-                                e1.getId(), e2.getId()));
-                    }
-
-                    // Hall conflict
-                    if (e1.getHallId() != null && e1.getHallId().equals(e2.getHallId()) && !e1.getHallId().isEmpty()) {
-                        conflicts.add(new Conflict(
-                                "HALL",
-                                String.format("Hall %s: %s & %s on %s",
-                                        e1.getHallId(),
+                                        "%s & %s are scheduled at the same time.",
                                         e1.getCourseName(),
-                                        e2.getCourseName(),
-                                        e1.getExamDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))),
-                                e1.getId(), e2.getId()));
-                    }
-
-                    // Faculty conflict
-                    if (e1.getFacultyName() != null && e1.getFacultyName().equals(e2.getFacultyName())
-                            && !e1.getFacultyName().isEmpty()) {
-                        conflicts.add(new Conflict(
-                                "FACULTY",
-                                String.format("Faculty %s: %s & %s on %s",
-                                        e1.getFacultyName(),
-                                        e1.getCourseName(),
-                                        e2.getCourseName(),
-                                        e1.getExamDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))),
+                                        e2.getCourseName()),
                                 e1.getId(), e2.getId()));
                     }
                 }
 
-                // --- NEW VALIDATIONS (Running outside purely time-based conflictsWith check if
-                // needed, or keeping inside?) ---
-                // Wait, logic above relies on `conflictsWith` which likely checks Date overlap.
-                // The new rules might apply even if times DON'T overlap (e.g. strict subject
-                // duplication).
-                // Example: Subject A on Monday, Subject A on Tuesday -> conflict (Duplication).
-                // But the loop condition above `if (e1.conflictsWith(e2))` restricts to Time
-                // Overlaps.
-                // WE NEED TO CHECK THESE OUTSIDE THE `conflictsWith` BLOCK for pure logical
-                // constraints.
+                // Conflicts that don't require time overlap - just same date
 
-                // Logic:
+                // 2. Daily Load Limit (Max 2 exams per day per Dept/Sem AND Exam Type each)
+                if (e1.getSemester().equals(e2.getSemester())
+                        && e1.getDepartment().equals(e2.getDepartment())
+                        && e1.getExamDate().equals(e2.getExamDate())
+                        && e1.getExamType().equalsIgnoreCase(e2.getExamType())) {
+
+                    String loadKey = e1.getExamDate() + "-" + e1.getSemester() + "-" + e1.getDepartment() + "-"
+                            + e1.getExamType().toLowerCase();
+                    long dailyLoad = exams.stream().filter(e -> e.getExamDate().equals(e1.getExamDate())
+                            && e.getSemester().equals(e1.getSemester())
+                            && e.getDepartment().equals(e1.getDepartment())
+                            && e.getExamType().equalsIgnoreCase(e1.getExamType())
+                            && e.getStatus() != ExamStatus.DELETED).count();
+
+                    if (dailyLoad > 2 && !reportedLoadKeys.contains(loadKey)) {
+                        reportedLoadKeys.add(loadKey);
+                        conflicts.add(new Conflict(
+                                "MAX_LOAD",
+                                String.format("Sem %d %s  :  %d exams on %s (limit: 2)",
+                                        e1.getSemester(), e1.getDepartment(), dailyLoad,
+                                        e1.getExamDate().format(DateTimeFormatter.ofPattern("dd MMM"))),
+                                e1.getId(), e2.getId()));
+                    }
+                }
+
+                // 3. Daily Limit for Retest MSE I (One per day)
                 if (e1.getSemester().equals(e2.getSemester()) && e1.getDepartment().equals(e2.getDepartment())) {
                     String type1 = e1.getExamType() != null ? e1.getExamType().trim() : "";
                     String type2 = e2.getExamType() != null ? e2.getExamType().trim() : "";
 
-                    // 1. Same Subject Constraint
-                    if (e1.getCourseName().equalsIgnoreCase(e2.getCourseName())) {
-                        // Case A: Exact same exam type (e.g. both Retest MSE I) -> Duplicate Subject
-                        if (type1.equalsIgnoreCase(type2) && (type1.contains("Retest") || type1.contains("MSE"))) {
-                            conflicts.add(new Conflict(
-                                    "DUPLICATE_SUBJECT",
-                                    String.format("Subject '%s' is already scheduled for %s", e1.getCourseName(),
-                                            type1),
-                                    e1.getId(), e2.getId()));
-                        }
-
-                    }
-
-                    // 2. Daily Limit for Retest MSE I (One per day)
-                    // "Retest is should allow me to schecule only one time on the same date"
                     if (e1.getExamDate().equals(e2.getExamDate())) {
-                        if (type1.equalsIgnoreCase("Retest MSE I") && type2.equalsIgnoreCase("Retest MSE I")) {
+                        if ((type1.equalsIgnoreCase("Retest MSE I") && type2.equalsIgnoreCase("Retest MSE I"))
+                                || (type1.equalsIgnoreCase("Retest MSE II") && type2.equalsIgnoreCase("Retest MSE II"))
+                                        && !e1.getCourseName().equalsIgnoreCase(e2.getCourseName())) {
                             conflicts.add(new Conflict(
                                     "DAILY_LIMIT",
-                                    String.format("Only one Retest MSE I allowed per date. Conflicts: %s and %s",
-                                            e1.getCourseName(), e2.getCourseName()),
+                                    String.format("Only one %s allowed per date. Conflicts: %s and %s",
+                                            type1, e1.getCourseName(), e2.getCourseName()),
                                     e1.getId(), e2.getId()));
                         }
                     }
@@ -193,18 +182,17 @@ public class ExamService {
         return new ConflictResult(conflicts.isEmpty(), conflicts);
     }
 
-    // Auto-resolve conflicts by rescheduling
+    // Auto-resolve conflicts by rescheduling (Prioritize TIME change, then DATE,
+    // respecting Max Load per Type)
     public int autoResolveConflicts(Integer semester, String department) {
-        List<Exam> allExams = getExams(semester, department, ExamStatus.DRAFT);
+        System.out.println("Module 1: Auto-Resolve started for Sem: " + semester + ", Dept: " + department);
+        List<Exam> allExams = getExams(semester, department, null).stream()
+                .filter(e -> e.getStatus() != ExamStatus.DELETED)
+                .collect(Collectors.toList());
+        int resolvedCount = 0;
+
         List<Exam> examsToReschedule = new ArrayList<>();
         List<Exam> stableExams = new ArrayList<>();
-
-        // 1. Separate conflicting drafts from stable exams
-        // A simple greed approach:
-        // Iterate exams. If an exam conflicts with any ALREADY ACCEPTED exam, mark it
-        // for reschedule.
-        // If it doesn't conflict, accept it.
-        // Prefer PUBLISHED exams as stable.
 
         // Sort: PUBLISHED first, then by date/time
         allExams.sort(Comparator.comparing((Exam e) -> e.getStatus() == ExamStatus.PUBLISHED ? 0 : 1)
@@ -213,11 +201,26 @@ public class ExamService {
 
         for (Exam candidate : allExams) {
             boolean hasConflict = false;
+
+            // Check Daily Load Limit First (against stable exams of SAME TYPE)
+            long dailyCount = stableExams.stream().filter(e -> e.getExamDate().equals(candidate.getExamDate())
+                    && e.getSemester().equals(candidate.getSemester())
+                    && e.getDepartment().equals(candidate.getDepartment())
+                    && e.getExamType().equalsIgnoreCase(candidate.getExamType())).count();
+
+            if (dailyCount >= 2) {
+                hasConflict = true;
+                System.out.println("Constraint Conflict: Max 2 exams per day limit reached for "
+                        + candidate.getCourseName() + " (" + candidate.getExamType() + ")");
+            }
+
             for (Exam stable : stableExams) {
-                if (candidate.conflictsWith(stable)) {
+                // Check for Time Conflict
+                if (candidate.conflictsWith(stable) && candidate.getSemester().equals(stable.getSemester())) {
                     hasConflict = true;
-                    break;
                 }
+                if (hasConflict)
+                    break;
             }
 
             if (hasConflict && candidate.getStatus() == ExamStatus.DRAFT) {
@@ -227,50 +230,57 @@ public class ExamService {
             }
         }
 
-        int resolvedCount = 0;
         LocalTime[] standardSlots = { LocalTime.of(9, 30), LocalTime.of(13, 30) };
         int standardDuration = 90;
 
-        // 2. Reschedule the conflicting exams
         for (Exam exam : examsToReschedule) {
             LocalDate date = exam.getExamDate();
             boolean scheduled = false;
 
-            // Try to find a slot within the next 30 days
+            // Try to find a slot within the next 30 days (starting D=0 for SAME DAY)
             for (int d = 0; d < 30 && !scheduled; d++) {
                 LocalDate targetDate = date.plusDays(d);
+
+                // Check Daily Load for Target Date (SAME TYPE)
+                long targetDailyCount = stableExams.stream().filter(e -> e.getExamDate().equals(targetDate)
+                        && e.getSemester().equals(exam.getSemester())
+                        && e.getDepartment().equals(exam.getDepartment())
+                        && e.getExamType().equalsIgnoreCase(exam.getExamType())
+                        && e.getStatus() != ExamStatus.DELETED).count();
+
+                if (targetDailyCount >= 2) {
+                    continue; // Skip this date, it's full (2 exams already)
+                }
 
                 for (LocalTime slotStart : standardSlots) {
                     LocalTime slotEnd = slotStart.plusMinutes(standardDuration);
 
-                    // Check conflicts with ALL stable exams
                     boolean slotBusy = false;
                     for (Exam stable : stableExams) {
-                        // Check logic similar to conflictsWith but specifically for this time slot
-                        if (stable.getSemester().equals(exam.getSemester())) { // Student conflict constraint
+                        if (stable.getSemester().equals(exam.getSemester())) {
                             if (stable.getExamDate().equals(targetDate)) {
-                                // Overlap check
+                                // 1. Time Overlap Check
                                 if (stable.getStartTime().isBefore(slotEnd) && stable.getEndTime().isAfter(slotStart)) {
                                     slotBusy = true;
                                     break;
                                 }
                             }
                         }
-                        // Note: Ignoring Hall/Faculty constraints for auto-resolve simplicity for now,
-                        // focusing on Student TimeTable conflicts as requested.
                     }
 
                     if (!slotBusy) {
-                        // Found a spot!
                         exam.setExamDate(targetDate);
                         exam.setStartTime(slotStart);
                         exam.setEndTime(slotEnd);
                         exam.setDurationMinutes(standardDuration);
 
                         examRepository.save(exam);
-                        stableExams.add(exam); // It's now stable
+                        stableExams.add(exam);
                         resolvedCount++;
                         scheduled = true;
+
+                        System.out
+                                .println("Rescheduled " + exam.getCourseName() + " to " + targetDate + " " + slotStart);
                         break;
                     }
                 }
@@ -333,7 +343,6 @@ public class ExamService {
                 .collect(Collectors.toList());
     }
 
-    // Inner classes for results
     public static class Conflict {
         private String type;
         private String message;
