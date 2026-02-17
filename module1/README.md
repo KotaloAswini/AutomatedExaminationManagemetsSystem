@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> aa3dde3a355e5ae820d12b7242436f4d3dda3c1c
 Follow these steps to set up the project locally.
 
 ### Prerequisites
@@ -6,7 +10,11 @@ Follow these steps to set up the project locally.
 - **MongoDB**: Running locally or via Atlas
 
 ### 1. Database Setup
+<<<<<<< HEAD
 Ensure your local MongoDB instance is running.
+=======
+Ensure your local MongoDB instance is running. 
+>>>>>>> aa3dde3a355e5ae820d12b7242436f4d3dda3c1c
 
 ### 2. Backend Setup
 Navigate to the backend directory and start the Spring Boot application.
