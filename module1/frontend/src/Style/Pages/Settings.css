@@ -49,7 +49,8 @@
 
 .settings-divider {
     height: 1px;
-    background-color: rgba(226, 232, 240, 0.8);
+    background-color: rgba(203, 213, 225, 1);
+    /* Darker slate-300 for visibility */
     margin: 0;
 }
 
@@ -268,7 +269,8 @@
 }
 
 body.dark .settings-divider {
-    background-color: rgba(51, 65, 85, 0.5);
+    background-color: rgba(71, 85, 105, 1);
+    /* Slate-600 for better contrast */
 }
 
 body.dark .about-section-link:hover {

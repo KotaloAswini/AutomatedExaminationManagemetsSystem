@@ -1,9 +1,3 @@
-# 📅 Timetable Generation System
-
->A powerful and intuitive tool to streamline exam scheduling for educational institutions.
-
-## 🚀 Quick Start
-
 Follow these steps to set up the project locally.
 
 ### Prerequisites
@@ -12,8 +6,7 @@ Follow these steps to set up the project locally.
 - **MongoDB**: Running locally or via Atlas
 
 ### 1. Database Setup
-Ensure your local MongoDB instance is running. The application connects to:
-- **URL**: `mongodb://localhost:27017/timetable_db` (Default)
+Ensure your local MongoDB instance is running.
 
 ### 2. Backend Setup
 Navigate to the backend directory and start the Spring Boot application.
