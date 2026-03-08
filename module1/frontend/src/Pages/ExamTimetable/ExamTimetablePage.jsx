@@ -1,4 +1,4 @@
-﻿import { memo, useCallback, useEffect, useState } from 'react';
+﻿import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Trash from '../../Icons/Trash';
 import EditIcon from '../../Icons/Edit';
@@ -62,6 +62,21 @@ function ExamTimetablePage() {
 
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
+    const searchRef = useRef(null);
+
+    useEffect(() => {
+        function handleKeyDown(e) {
+            const tag = document.activeElement?.tagName;
+            const isEditable = document.activeElement?.isContentEditable;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || isEditable) return;
+            if (e.key === '/') {
+                e.preventDefault();
+                searchRef.current?.focus();
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     // Filter state
     const [filterSemester, setFilterSemester] = useState();
@@ -385,18 +400,21 @@ function ExamTimetablePage() {
                 </h1>
                 <div className='header-actions'>
                     <div className="exam-search-container">
-                        <span className="exam-search-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                        <span className="exam-search-icon">
                             <div style={{ width: '16px', height: '16px' }}>
-                                <SearchIcon fillColor="#64748b" />
+                                <SearchIcon fillColor="#5a7090" />
                             </div>
                         </span>
                         <input
+                            ref={searchRef}
                             type="text"
                             className="exam-search-input"
-                            placeholder="Search by name or date..."
+                            placeholder="Search or jump to..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Escape' && e.target.blur()}
                         />
+                        <span className="exam-search-shortcut">/</span>
                     </div>
                 </div>
             </div>

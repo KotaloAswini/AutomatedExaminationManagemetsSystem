@@ -1,4 +1,4 @@
-import { memo, useEffect, useState, useCallback } from 'react';
+import { memo, useEffect, useRef, useState, useCallback } from 'react';
 import '../../Style/Pages/ExamTimetablePage.css';
 import { useAlert } from '../../Components/AlertContextProvider';
 import { useConfirm } from '../../Components/ConfirmContextProvider';
@@ -29,6 +29,21 @@ function PublishedTimetablePage() {
     const [filterDepartment, setFilterDepartment] = useState('');
     const [filterExamType, setFilterExamType] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const searchRef = useRef(null);
+
+    useEffect(() => {
+        function handleKeyDown(e) {
+            const tag = document.activeElement?.tagName;
+            const isEditable = document.activeElement?.isContentEditable;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || isEditable) return;
+            if (e.key === '/') {
+                e.preventDefault();
+                searchRef.current?.focus();
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     // Edit modal state
     const [showEditModal, setShowEditModal] = useState(false);
@@ -357,12 +372,15 @@ function PublishedTimetablePage() {
                             </div>
                         </span>
                         <input
+                            ref={searchRef}
                             type="text"
                             className="exam-search-input"
-                            placeholder="Search by name or date..."
+                            placeholder="Search or jump to..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Escape' && e.target.blur()}
                         />
+                        <span className="exam-search-shortcut">/</span>
                     </div>
                 </div>
             </div>

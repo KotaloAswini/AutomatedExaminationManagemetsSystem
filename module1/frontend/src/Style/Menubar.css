@@ -166,6 +166,12 @@ body.dark .menubar-container .title .dark-logo {
     border-radius: 12px;
 }
 
+.icon-container {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .menu-container li {
     list-style: none;
     font-size: 1rem;
@@ -350,11 +356,6 @@ body.dark .app.active .menu-container.active .icon {
 
     .app.active .menubar-container .toggle-menubar-icon {
         left: 100%;
-    }
-
-    .menu-container svg {
-        display: grid;
-        justify-self: right;
     }
 
     .menu-container li {
