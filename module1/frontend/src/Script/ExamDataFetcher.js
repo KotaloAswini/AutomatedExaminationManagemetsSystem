@@ -2,6 +2,17 @@ import { url as API_URL } from './fetchUrl';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+function getActorEmail() {
+    try {
+        const raw = sessionStorage.getItem('user');
+        if (!raw) return '';
+        const user = JSON.parse(raw);
+        return user?.email || '';
+    } catch {
+        return '';
+    }
+}
+
 // Helper to format time to 12-hour format
 export function formatTo12Hour(timeStr) {
     if (!timeStr) return '';
@@ -39,7 +50,9 @@ export async function scheduleExam(
     onError
 ) {
     try {
-        const response = await fetch(`${API_URL}/api/exams`, {
+        const actorEmail = getActorEmail();
+        const endpoint = `${API_URL}/api/exams${actorEmail ? `?actorEmail=${encodeURIComponent(actorEmail)}` : ''}`;
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(exam)
@@ -68,7 +81,9 @@ export async function updateExam(
     onError
 ) {
     try {
-        const response = await fetch(`${API_URL}/api/exams/${id}`, {
+        const actorEmail = getActorEmail();
+        const endpoint = `${API_URL}/api/exams/${id}${actorEmail ? `?actorEmail=${encodeURIComponent(actorEmail)}` : ''}`;
+        const response = await fetch(endpoint, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updates)
@@ -94,7 +109,9 @@ export async function deleteExam(
     onError
 ) {
     try {
-        const response = await fetch(`${API_URL}/api/exams/${id}`, {
+        const actorEmail = getActorEmail();
+        const endpoint = `${API_URL}/api/exams/${id}${actorEmail ? `?actorEmail=${encodeURIComponent(actorEmail)}` : ''}`;
+        const response = await fetch(endpoint, {
             method: 'DELETE'
         });
 
@@ -138,6 +155,8 @@ export async function autoResolveConflicts(
     const params = new URLSearchParams();
     if (semester) params.append('semester', semester.toString());
     if (department) params.append('department', department);
+    const actorEmail = getActorEmail();
+    if (actorEmail) params.append('actorEmail', actorEmail);
 
     const url = `${API_URL}/api/exams/auto-resolve${params.toString() ? '?' + params.toString() : ''}`;
 
@@ -161,6 +180,8 @@ export async function publishTimetable(
     const params = new URLSearchParams();
     if (semester) params.append('semester', semester.toString());
     if (department) params.append('department', department);
+    const actorEmail = getActorEmail();
+    if (actorEmail) params.append('actorEmail', actorEmail);
 
     const url = `${API_URL}/api/exams/publish${params.toString() ? '?' + params.toString() : ''}`;
 
@@ -192,7 +213,7 @@ export async function getExamStatus() {
 
 
 // Generate printable timetable HTML
-export function generatePrintableHTML(exams, subjects, title) {
+function generatePrintableHTML(exams, subjects, title) {
     // Sort exams by date and time
     const sortedExams = [...exams].sort((a, b) => {
         const dateA = new Date(a.examDate + 'T' + a.startTime);

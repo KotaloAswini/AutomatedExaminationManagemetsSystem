@@ -16,8 +16,9 @@
 }
 
 .dashboard-container.compact-mode {
-    padding: 1rem;
-    max-width: 1440px;
+    padding: 0.4rem;
+    max-width: none;
+    width: 86%;
     margin: 0 auto;
     height: 100%;
     overflow: hidden;
@@ -33,18 +34,18 @@
 /* === Top Section: Welcome + Mini Stats === */
 .top-section {
     display: grid;
-    grid-template-columns: 35% 63%;
-    gap: 2%;
+    grid-template-columns: minmax(320px, 36%) minmax(0, 1fr);
+    gap: 0.75rem;
     align-items: stretch;
-    min-height: 100px;
+    min-height: 94px;
 }
 
 .welcome-card {
     background: linear-gradient(135deg, #0a2540 0%, #1e40af 50%, #3b82f6 100%);
     /* Professional sleek blue gradient */
     color: white;
-    padding: 0.75rem 1.25rem;
-    border-radius: 16px;
+    padding: 0.68rem 1.08rem;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -53,6 +54,7 @@
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 0;
 }
 
 .welcome-content-wrapper {
@@ -60,6 +62,7 @@
     align-items: center;
     gap: 1.5rem;
     width: 100%;
+    min-width: 0;
 }
 
 .welcome-avatar-large {
@@ -119,6 +122,8 @@
     flex-direction: column;
     justify-content: center;
     gap: 0.4rem;
+    min-width: 0;
+    width: 100%;
 }
 
 .welcome-header h1 {
@@ -128,6 +133,9 @@
     letter-spacing: -0.025em;
     line-height: 1.2;
     color: white;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-height: calc(1.2em + 2px);
 }
 
 .welcome-header p {
@@ -138,6 +146,7 @@
     max-width: 400px;
     line-height: 1.4;
     color: white;
+    min-height: calc(1.4em * 2);
 }
 
 .btn-sm {
@@ -300,14 +309,16 @@
 .pipeline-card {
     background: #ffffff;
     border-radius: 16px;
-    padding: 1rem 1.5rem;
+    padding: 0.88rem 1.18rem;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.55rem;
     border: 1px solid rgba(226, 232, 240, 0.8);
     position: relative;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -339,6 +350,10 @@
     font-weight: 600;
     color: #94a3b8;
     letter-spacing: 0.2px;
+}
+
+.pipeline-status-complete {
+    color: #25D366;
 }
 
 .pipeline-steps {
@@ -502,6 +517,10 @@ body.dark .pipeline-status-text {
     color: #475569;
 }
 
+body.dark .pipeline-status-complete {
+    color: #25D366;
+}
+
 body.dark .pipe-step {
     background: #1e293b;
     border-color: #334155;
@@ -567,10 +586,10 @@ body.dark .pipe-connector-line.active {
 /* === Bottom Section: 3 Columns === */
 .bottom-section-grid {
     display: grid;
-    grid-template-columns: 25% 48% 23%;
-    /* Adjusted for better balance */
-    gap: 1rem;
-    flex-grow: 1;
+    grid-template-columns: 1fr 23%;
+    /* Two-column layout after removing My Profile section */
+    gap: 0.75rem;
+    flex-grow: 0;
     min-height: 0;
     overflow: hidden;
 }
@@ -579,8 +598,17 @@ body.dark .pipe-connector-line.active {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    height: 100%;
+    height: auto;
     align-items: stretch;
+}
+
+.dashboard-col.insights-col {
+    min-height: 0;
+}
+
+.dashboard-col.insights-col .system-status-card {
+    flex: 0 0 auto;
+    margin-top: 0;
 }
 
 .panel-header-sm {
@@ -1061,14 +1089,14 @@ body.dark .view-profile-btn:hover {
 }
 
 .insights-tab.active {
-    color: #3b82f6;
-    border-bottom-color: #3b82f6;
+    color: #0f172a;
+    border-bottom-color: #0f172a;
     background: white;
 }
 
 .insights-tab.active svg {
     opacity: 1;
-    stroke: #3b82f6;
+    stroke: #0f172a;
 }
 
 .insights-content {
@@ -1279,13 +1307,13 @@ body.dark .insights-tab {
 }
 
 body.dark .insights-tab.active {
-    color: #60a5fa;
-    border-bottom-color: #3b82f6;
+    color: #f1f5f9;
+    border-bottom-color: #f1f5f9;
     background: #1e293b;
 }
 
 body.dark .insights-tab.active svg {
-    stroke: #60a5fa;
+    stroke: #f1f5f9;
 }
 
 body.dark .insight-metric:hover {
@@ -1523,7 +1551,26 @@ body.dark .tip-box-xs {
     }
 }
 
+@media (max-width: 800px) {
+    .dashboard-container.compact-mode {
+        width: calc(100% - 16px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
 @media (max-width: 768px) {
+    .welcome-header {
+        align-items: center;
+        text-align: center;
+    }
+
+    .welcome-card .btn-light {
+        align-self: flex-start;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
     .mini-stats {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
@@ -1571,6 +1618,12 @@ body.dark .tip-box-xs {
     .welcome-header h1 {
         font-size: 1.5rem;
     }
+
+    .welcome-header p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
 }
 
 /* Modern Dev Tool / Coder Theme (Refined) */
@@ -1591,7 +1644,7 @@ body.dark .tip-box-xs {
 }
 
 .rich-activity-table th {
-    padding: 12px 16px;
+    padding: 11px 16px;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1609,13 +1662,14 @@ body.dark .tip-box-xs {
 }
 
 .rich-activity-table td {
-    padding: 12px 16px;
+    padding: 11px 16px;
     vertical-align: middle;
     border-bottom: 1px solid #e2e8f0;
     font-size: 0.85rem;
     color: #334155;
     border-right: 1px solid #e2e8f0;
     /* Darker border */
+    transition: background 0.2s ease;
 }
 
 .rich-activity-table td:last-child {
@@ -1678,8 +1732,8 @@ body.dark .tip-box-xs {
 }
 
 .course-name-text {
-    color: #2563eb;
-    /* Tech Blue */
+    color: #0f172a;
+    /* Neutral dark text */
     font-weight: 600;
     font-family: inherit;
     font-size: 0.9rem;
@@ -1755,8 +1809,8 @@ body.dark .date-day {
 }
 
 body.dark .course-name-text {
-    color: #93c5fd;
-    /* Light Blue-300 */
+    color: #f1f5f9;
+    /* Neutral light text */
 }
 
 body.dark .course-id-text {
@@ -1786,12 +1840,12 @@ body.dark .compact-status-box {
     background: white;
     border-radius: 10px;
     /* Slightly tighter radius */
-    padding: 0.3rem;
-    /* Max compact padding */
+    padding: 0.65rem;
+    /* Larger padding for better card height */
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
-    /* Minimum gap */
+    gap: 0.45rem;
+    /* More breathing room between rows */
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-top: auto;
@@ -1804,9 +1858,9 @@ body.dark .compact-status-box {
     align-items: center;
     justify-content: space-between;
     /* Horizontal layout */
-    gap: 0.3rem;
-    padding: 0.2rem 0.3rem;
-    /* Ultra ultra compact */
+    gap: 0.55rem;
+    padding: 0.45rem 0.6rem;
+    /* Increased for larger row height */
     border-radius: 5px;
     /* Slightly smaller radius */
     background: #f8fafc;
@@ -1826,16 +1880,16 @@ body.dark .compact-status-box {
 .status-item-left {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.55rem;
     /* Tighter */
     overflow: hidden;
     /* Prevent text overflow */
 }
 
 .status-icon-box {
-    width: 20px;
-    /* Micro icon box */
-    height: 20px;
+    width: 28px;
+    /* Larger icon box */
+    height: 28px;
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -1844,8 +1898,8 @@ body.dark .compact-status-box {
 }
 
 .status-icon-box svg {
-    width: 11px;
-    height: 11px;
+    width: 15px;
+    height: 15px;
 }
 
 /* Server Icon Style */
@@ -1867,8 +1921,8 @@ body.dark .compact-status-box {
 }
 
 .status-label {
-    font-size: 0.65rem;
-    /* Smaller text */
+    font-size: 0.82rem;
+    /* Increased text */
     font-weight: 700;
     color: #475569;
     white-space: nowrap;
@@ -1879,11 +1933,11 @@ body.dark .compact-status-box {
 
 /* Right side: Badge */
 .status-badge {
-    font-size: 0.55rem;
-    /* Micro badge */
+    font-size: 0.78rem;
+    /* Larger badge text */
     font-weight: 700;
-    padding: 0 4px;
-    /* Minimal padding */
+    padding: 4px 10px;
+    /* Larger badge body */
     border-radius: 3px;
     letter-spacing: 0.1px;
     text-transform: uppercase;

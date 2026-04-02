@@ -1,6 +1,7 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { canScheduleTimetable } from '../Script/Constants';
 
 import '../Style/Menubar.css';
 import logo from '../../images/logo.png';
@@ -48,6 +49,31 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
 
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [showFooterLogout, setShowFooterLogout] = useState(false);
+    const accountBlockRef = useRef(null);
+    const accountName = user?.name || user?.email?.split('@')[0] || 'User';
+    const accountHandle = user?.email || accountName;
+    const accountAvatarUrl = user?.profilePicture ? user.profilePicture.split('#meta=')[0].split('|meta=')[0] : '';
+    const accountInitials = accountName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0]?.toUpperCase())
+        .join('') || 'U';
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (!showFooterLogout) return;
+            if (accountBlockRef.current && !accountBlockRef.current.contains(event.target)) {
+                setShowFooterLogout(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+        };
+    }, [showFooterLogout]);
 
     function toggleMenubar() {
         let activeApp = document.querySelector(".app.active");
@@ -55,6 +81,7 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
         if (app) app.classList.toggle("active")
         if (activeApp) activeApp.classList.remove("active")
         setSidebarOpen(prev => !prev);
+        setShowFooterLogout(false);
         onMenuToggleClick()
     }
 
@@ -65,16 +92,18 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
                 app.classList.add("active")
             }
             setSidebarOpen(false);
+            setShowFooterLogout(false);
             onMenuToggleClick();
         }
     };
 
     const handleLogout = () => {
+        setShowFooterLogout(false);
         // Close sidebar on mobile before showing confirmation
         handleLinkClick();
 
         showConfirm(
-            `Sign out of '${user?.name || user?.username || 'User'}'?`,
+            `Sign out of '${user?.name || user?.email?.split('@')[0] || 'User'}'?`,
             {
                 // theme: 'dark', // Removed to use standard VS Code style
                 confirmText: 'Sign Out',
@@ -92,7 +121,7 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
                         <img src={logo} alt="AEMS" className="logo-img" style={{ margin: '1.5rem auto 0.5rem', cursor: 'pointer' }} />
                     </Link>
                 </div>
-                <div className='toggle-menu' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 5.5rem 0 1.5rem', width: '100%' }}>
+                <div className='toggle-menu' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '0', width: '100%', marginTop: '2.4rem' }}>
                     <span className="toggle-icon-wrapper" onClick={toggleMenubar} data-tooltip={sidebarOpen ? 'Close sidebar' : 'Open sidebar'} style={{ position: 'relative', display: 'inline-flex', cursor: 'pointer' }}>
                         <svg className='icon' xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
                     </span>
@@ -101,7 +130,11 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
 
             <div className='menu-list' style={{ width: '100%' }}>
 
-                {menuData.map((menu, index) => {
+                {menuData.filter(menu => {
+                    const isCoordinator = canScheduleTimetable(user?.email);
+                    if (menu.name === "Exam Timetable" && !isCoordinator) return false;
+                    return true;
+                }).map((menu, index) => {
                     const isActive = route.pathname === menu.link || (menu.link === '/Settings' && route.pathname === '/AboutUs')
 
                     return (
@@ -115,14 +148,52 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
                 })}
 
                 <div className="menubar-footer">
-                    <div className="menu-container logout-btn" onClick={handleLogout} data-tooltip="Logout">
-                        <div className='icon-container'>
-                            <div className='icon'>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <div className="footer-account-block" ref={accountBlockRef}>
+                        {showFooterLogout && (
+                            <div className="account-popover" role="menu" aria-label="Account menu">
+                                <button type="button" className="account-popover-item logout-action" onClick={handleLogout}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                    <span>Log out</span>
+                                </button>
+                                <span className="account-popover-arrow" aria-hidden="true"></span>
+                            </div>
+                        )}
+
+                        <div
+                            className="footer-account-card"
+                            role="button"
+                            tabIndex={0}
+                            aria-expanded={showFooterLogout}
+                            onClick={() => setShowFooterLogout(prev => !prev)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setShowFooterLogout(prev => !prev);
+                                }
+                            }}
+                        >
+                            <div className="account-avatar" aria-hidden="true">
+                                {accountAvatarUrl ? <img src={accountAvatarUrl} alt="" /> : accountInitials}
+                            </div>
+                            <div className="account-meta">
+                                <div className="account-name">{accountName}</div>
+                                <div className="account-handle">{accountHandle}</div>
                             </div>
                         </div>
-                        <li className='hide-able'>Logout</li>
                     </div>
+
+                    <button
+                        className="compact-profile"
+                        type="button"
+                        aria-label="Profile"
+                        data-tooltip={accountName}
+                        aria-expanded={showFooterLogout}
+                        onClick={() => setShowFooterLogout(prev => !prev)}
+                    >
+                        <div className="account-avatar" aria-hidden="true">
+                            {accountAvatarUrl ? <img src={accountAvatarUrl} alt="" /> : accountInitials}
+                        </div>
+                    </button>
                 </div>
             </div>
         </nav >

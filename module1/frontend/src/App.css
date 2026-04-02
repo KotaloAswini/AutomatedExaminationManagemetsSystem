@@ -79,7 +79,7 @@ body.light {
 	width: 100%;
 	background: var(--foregroudColor);
 	grid-template-columns: 16% auto;
-	transition: 0.3s;
+	transition: grid-template-columns 260ms cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease;
 }
 
 html,

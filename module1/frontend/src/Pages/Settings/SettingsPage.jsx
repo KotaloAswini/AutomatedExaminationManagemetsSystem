@@ -1,6 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../Components/AuthContext';
 import '../../Style/UnifiedPages.css';
 import '../../Style/Pages/Settings.css';
 
@@ -32,31 +32,54 @@ export function changeAccent(color) {
 }
 
 function SettingsPage() {
-    const { user } = useAuth();
-    const [currentTheme, setCurrentTheme] = useState('Light');
+    const [manualTheme, setManualTheme] = useState('Light');
+    const [useSystemTheme, setUseSystemTheme] = useState(false);
     const [currentAccent, setCurrentAccent] = useState('#2563eb');
 
     const accents = [
-        { name: 'Blue', color: '#1a73e8' },
-        { name: 'Green', color: '#10a37f' },
-        { name: 'Indigo', color: '#635bff' },
-        { name: 'Coral', color: '#FF5A5F' },
-        { name: 'Orange', color: '#FF9900' }
+        { name: 'Blue', color: '#2563eb' },
+        { name: 'Yellow', color: '#facc15' },
+        { name: 'Pink', color: '#f3138a' },
+        { name: 'Purple', color: '#6d4dff' },
+        { name: 'Orange', color: '#ff8a00' },
+        { name: 'Green', color: '#00c389' }
     ];
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'Light';
+        const savedManualTheme = localStorage.getItem('manualTheme') || (savedTheme === 'Dark' ? 'Dark' : 'Light');
         const savedAccent = localStorage.getItem('accentColor') || '#2563eb';
-        setCurrentTheme(savedTheme);
+        setManualTheme(savedManualTheme);
+        setUseSystemTheme(savedTheme === 'System');
         setCurrentAccent(savedAccent);
         changeTheme(savedTheme);
         changeAccent(savedAccent);
     }, []);
 
     const handleThemeChange = (theme) => {
-        setCurrentTheme(theme);
         changeTheme(theme);
     };
+
+    const handleManualThemeChange = (theme) => {
+        setUseSystemTheme(false);
+        setManualTheme(theme);
+        localStorage.setItem('manualTheme', theme);
+        handleThemeChange(theme);
+    };
+
+    const handleSystemThemeToggle = () => {
+        const nextUseSystemTheme = !useSystemTheme;
+        setUseSystemTheme(nextUseSystemTheme);
+        if (nextUseSystemTheme) {
+            handleThemeChange('System');
+            return;
+        }
+        handleThemeChange(manualTheme);
+    };
+
+    const effectiveTheme = useSystemTheme
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Dark' : 'Light')
+        : manualTheme;
 
     const handleAccentChange = (color) => {
         setCurrentAccent(color);
@@ -67,104 +90,58 @@ function SettingsPage() {
         <div className='page settings-page'>
             <div className='settings-container'>
                 <div className='settings-card appearance-card'>
-                    <div className='card-header'>
-                        <div className='card-header-icon'>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-                        </div>
-                        <div>
-                            <h2>Appearance</h2>
-                            <p className='card-desc'>Customize the look and feel</p>
-                        </div>
-                    </div>
-                    <div className='theme-switcher'>
+                    <h2 className='appearance-title'>Background</h2>
+                    <div className='background-options'>
                         <button
-                            className={`theme-btn ${currentTheme === 'Light' ? 'active' : ''}`}
-                            onClick={() => handleThemeChange('Light')}
+                            className={`background-option ${effectiveTheme === 'Light' ? 'active' : ''}`}
+                            onClick={() => handleManualThemeChange('Light')}
+                            aria-label='Default background'
                         >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="4" />
-                                <path d="M12 2v2" />
-                                <path d="M12 20v2" />
-                                <path d="m4.93 4.93 1.41 1.41" />
-                                <path d="m17.66 17.66 1.41 1.41" />
-                                <path d="M2 12h2" />
-                                <path d="M20 12h2" />
-                                <path d="m6.34 17.66-1.41 1.41" />
-                                <path d="m19.07 4.93-1.41 1.41" />
-                            </svg>
-                            <span>Light</span>
+                            <span className={`background-radio ${effectiveTheme === 'Light' ? 'checked' : ''}`}>
+                                {effectiveTheme === 'Light' && (
+                                    <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                                        <polyline points='20 6 9 17 4 12' />
+                                    </svg>
+                                )}
+                            </span>
+                            <span className='background-label'>Default</span>
+                            <span className='background-spacer' aria-hidden='true'></span>
                         </button>
                         <button
-                            className={`theme-btn ${currentTheme === 'Dark' ? 'active' : ''}`}
-                            onClick={() => handleThemeChange('Dark')}
+                            className={`background-option lights-out ${effectiveTheme === 'Dark' ? 'active' : ''}`}
+                            onClick={() => handleManualThemeChange('Dark')}
+                            aria-label='Lights out background'
                         >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                                <circle cx="18" cy="5" r="1" fill="currentColor" stroke="none" />
-                                <circle cx="20" cy="9" r="0.5" fill="currentColor" stroke="none" />
-                            </svg>
-                            <span>Dark</span>
-                        </button>
-                        <button
-                            className={`theme-btn ${currentTheme === 'System' ? 'active' : ''}`}
-                            onClick={() => handleThemeChange('System')}
-                        >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="2" y="3" width="20" height="14" rx="2" />
-                                <path d="M8 21h8" />
-                                <path d="M12 17v4" />
-                                <path d="m7 10 2 2 4-4" />
-                            </svg>
-                            <span>System</span>
+                            <span className={`background-radio ${effectiveTheme === 'Dark' ? 'checked' : ''}`}>
+                                {effectiveTheme === 'Dark' && (
+                                    <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                                        <polyline points='20 6 9 17 4 12' />
+                                    </svg>
+                                )}
+                            </span>
+                            <span className='background-label'>Lights out</span>
+                            <span className='background-spacer' aria-hidden='true'></span>
                         </button>
                     </div>
-                    <p className='theme-hint'>
-                        {currentTheme === 'System' ? (
-                            <>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                                </svg>
-                                <span>Syncing with system appearance</span>
-                            </>
-                        ) : currentTheme === 'Dark' ? (
-                            <>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                                </svg>
-                                <span>Dark appearance enabled</span>
-                            </>
-                        ) : (
-                            <>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="5"></circle>
-                                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                                </svg>
-                                <span>Light appearance enabled</span>
-                            </>
-                        )}
-                    </p>
+                    <div className='system-setting-row'>
+                        <span className='system-setting-label'>Use system setting</span>
+                        <button
+                            type='button'
+                            className={`system-setting-toggle ${useSystemTheme ? 'active' : ''}`}
+                            onClick={handleSystemThemeToggle}
+                            role='switch'
+                            aria-checked={useSystemTheme}
+                            aria-label='Use system setting'
+                        >
+                            <span className='system-setting-thumb' />
+                        </button>
+                    </div>
+                    <p className='system-setting-desc'>Choose your preferred theme</p>
                 </div>
 
                 <div className='settings-card combined-card'>
                     <div className='settings-section'>
-                        <div className='card-header'>
-                            <div className='card-header-icon accent-icon'>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
-                            </div>
-                            <div>
-                                <h2>Accent Color</h2>
-                                <p className='card-desc'>Select your preferred accent color</p>
-                            </div>
-                        </div>
+                        <h2 className='accent-title'>Color</h2>
                         <div className='accent-picker'>
                             {accents.map((accent) => (
                                 <button
@@ -172,8 +149,14 @@ function SettingsPage() {
                                     className={`accent-btn ${currentAccent === accent.color ? 'active' : ''}`}
                                     style={{ '--bg-accent': accent.color }}
                                     onClick={() => handleAccentChange(accent.color)}
-                                    title={accent.name}
-                                />
+                                    aria-label={accent.name}
+                                >
+                                    {currentAccent === accent.color && (
+                                        <svg className='accent-check' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                                            <polyline points='20 6 9 17 4 12' />
+                                        </svg>
+                                    )}
+                                </button>
                             ))}
                         </div>
                     </div>

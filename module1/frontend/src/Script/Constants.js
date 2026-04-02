@@ -6,3 +6,15 @@ export const TIME_SLOTS = [
 export const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export const DEPARTMENTS = ['CSE', 'AE', 'CE', 'ECE', 'EEE', 'ME', 'ISE', 'AI&DS', 'AI&ML'];
+
+export const ALLOWED_SCHEDULER_EMAILS = [
+    'nagaratna.p@nmit.ac.in',
+    'uma.r@nmit.ac.in',
+    '1nt22cs098.lalan@nmit.ac.in',
+    '1nt22cs092.kotalo@nmit.ac.in'
+];
+
+export const canScheduleTimetable = (email) => {
+    if (!email) return false;
+    return ALLOWED_SCHEDULER_EMAILS.includes(String(email).toLowerCase().trim());
+};

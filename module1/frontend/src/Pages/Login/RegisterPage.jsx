@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { url } from '../../Script/fetchUrl';
 import EyeIcon from '../../Icons/Eye';
 import ExclamationIcon from '../../Icons/Exclamation';
+import { canScheduleTimetable } from '../../Script/Constants';
 import './Login.css';
 
 function RegisterPage() {
     const [formData, setFormData] = useState({
         name: '',
-        username: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -27,13 +27,9 @@ function RegisterPage() {
         // Clear specific field error when user types
         setErrors(prev => ({ ...prev, [id]: '' }));
 
-        if (id === 'username') {
-            setFormData({ ...formData, [id]: value.toLowerCase().replace(/[^a-z0-9._]/g, '') });
-            return;
-        }
-        // Name: only allow letters and spaces
+        // Name: only allow letters, spaces, and dots
         if (id === 'name') {
-            setFormData({ ...formData, [id]: value.replace(/[^a-zA-Z\s]/g, '') });
+            setFormData({ ...formData, [id]: value.replace(/[^a-zA-Z\s.]/g, '') });
             return;
         }
         setFormData({ ...formData, [id]: value });
@@ -53,19 +49,12 @@ function RegisterPage() {
 
         // Helper to check empty
         if (!formData.name.trim()) newErrors.name = true;
-        if (!formData.username.trim()) newErrors.username = true;
         if (!formData.email.trim()) newErrors.email = true;
         if (!formData.password) newErrors.password = true;
         if (!formData.confirmPassword) newErrors.confirmPassword = true;
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            return;
-        }
-
-        // Validate username is provided
-        if (!formData.username.trim()) {
-            setError('Username is required.');
             return;
         }
 
@@ -86,6 +75,12 @@ function RegisterPage() {
             return;
         }
 
+        const normalizedEmail = formData.email.trim().toLowerCase();
+        if (normalizedEmail.endsWith('@nmit.ac.in') && !canScheduleTimetable(normalizedEmail)) {
+            setError('Only authorized @nmit.ac.in emails are permitted. Please use a personal email.');
+            return;
+        }
+
         setIsLoading(true);
         setError('');
 
@@ -95,8 +90,8 @@ function RegisterPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: formData.name,
-                    username: formData.username,
-                    email: formData.email,
+                    username: normalizedEmail,
+                    email: normalizedEmail,
                     password: formData.password
                 })
             });
@@ -108,7 +103,7 @@ function RegisterPage() {
             } else {
                 setError(data.error || 'Registration failed');
             }
-        } catch (err) {
+        } catch {
             setError('Server connection error. Is the backend running?');
         } finally {
             setIsLoading(false);
@@ -145,32 +140,6 @@ function RegisterPage() {
                                 </span>
                             )}
                             {errors.name && (
-                                <span className="validation-icon">
-                                    <ExclamationIcon size={20} color="#ef4444" />
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-
-                        <div className="input-wrapper">
-                            <input
-                                type="text"
-                                id="username"
-                                placeholder="Username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                className={errors.username ? 'input-error' : ''}
-                                required
-                            />
-                            {!formData.username && (
-                                <span className="input-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                </span>
-                            )}
-                            {errors.username && (
                                 <span className="validation-icon">
                                     <ExclamationIcon size={20} color="#ef4444" />
                                 </span>

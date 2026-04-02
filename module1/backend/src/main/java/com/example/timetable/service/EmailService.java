@@ -1,11 +1,12 @@
 package com.example.timetable.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class EmailService {
@@ -28,7 +29,6 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
-        message.setFrom(fromEmail);
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);
@@ -43,7 +43,7 @@ public class EmailService {
             logger.debug("Subject: {}", subject);
             logger.debug("Body: {}", body);
             logger.debug("-----------------------------------------------\n");
-        } catch (Exception e) {
+        } catch (MailException e) {
             logger.warn("⚠ Failed to send real email: {}", e.getMessage());
         }
     }

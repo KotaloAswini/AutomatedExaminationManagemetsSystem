@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // ConfirmContext.js
 import { createContext, useState, useContext } from 'react';
 

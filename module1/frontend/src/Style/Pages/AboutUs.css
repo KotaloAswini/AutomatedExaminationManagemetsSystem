@@ -577,13 +577,13 @@
 
 .aboutus-footer p {
     font-size: 0.78rem;
-    color: var(--textColor2, #94a3b8);
+    color: #25D366;
     margin: 0;
     letter-spacing: 0.01em;
 }
 
 .aboutus-footer-name {
-    color: var(--accentColor, #6366f1);
+    color: var(--userAccentColor, var(--accentColor, #6366f1));
     font-weight: 600;
 }
 
@@ -601,7 +601,7 @@
 
 .chillipages-brand {
     text-decoration: none;
-    color: var(--accentColor, #6366f1);
+    color: var(--userAccentColor, var(--accentColor, #6366f1));
     /* Matches Accent Color */
     transition: all 0.2s;
     font-weight: 600;
@@ -860,7 +860,7 @@ body.dark .aboutus-footer {
 }
 
 body.dark .aboutus-footer p {
-    color: #64748b;
+    color: #25D366;
 }
 
 /* Dark Mode Team Section */

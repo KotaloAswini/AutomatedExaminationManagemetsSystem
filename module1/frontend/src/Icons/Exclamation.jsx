@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ExclamationIcon = ({ size = 20, color = "currentColor" }) => {
     return (
         <svg

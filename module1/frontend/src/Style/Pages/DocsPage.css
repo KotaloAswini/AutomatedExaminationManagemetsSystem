@@ -80,7 +80,7 @@
 }
 
 .docs-section {
-    margin-bottom: 4rem;
+    margin-bottom: 1rem;
     max-width: 1000px;
 }
 
@@ -180,7 +180,7 @@ body.dark .docs-hero-subtitle {
 
 .docs-section h2 {
     font-size: 1.8rem;
-    margin-top: 2rem;
+    margin-top: 0.25rem;
     margin-bottom: 1rem;
     color: var(--textColor);
     border-bottom: 1px solid var(--borderColor);
@@ -547,6 +547,15 @@ body.dark .tech-tag.netlify {
 body.dark .tech-tag.render {
     background-color: rgba(129, 140, 248, 0.15);
     color: #818cf8 !important;
+}
+
+@media (max-width: 800px) {
+    .docs-container {
+        width: calc(100% - 16px);
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+    }
 }
 
 @media (max-width: 768px) {

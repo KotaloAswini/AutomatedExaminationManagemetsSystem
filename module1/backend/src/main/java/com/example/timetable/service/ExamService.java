@@ -1,17 +1,23 @@
 package com.example.timetable.service;
 
-import com.example.timetable.model.Exam;
-import com.example.timetable.model.Exam.ExamStatus;
-import com.example.timetable.repository.ExamRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.example.timetable.model.Exam;
+import com.example.timetable.model.Exam.ExamStatus;
+import com.example.timetable.repository.ExamRepository;
 
 @Service
 public class ExamService {
@@ -119,9 +125,6 @@ public class ExamService {
                     if (e1.getSemester().equals(e2.getSemester())
                             && e1.getExamType() != null && e1.getExamType().equalsIgnoreCase(e2.getExamType())
                             && !e1.getCourseName().equalsIgnoreCase(e2.getCourseName())) {
-                        String type1 = e1.getExamType() != null ? e1.getExamType().trim() : "";
-                        String type2 = e2.getExamType() != null ? e2.getExamType().trim() : "";
-
                         conflicts.add(new Conflict(
                                 "STUDENT",
                                 String.format(
@@ -341,10 +344,10 @@ public class ExamService {
     }
 
     public static class Conflict {
-        private String type;
-        private String message;
-        private String examId1;
-        private String examId2;
+        private final String type;
+        private final String message;
+        private final String examId1;
+        private final String examId2;
 
         public Conflict(String type, String message, String examId1, String examId2) {
             this.type = type;
@@ -371,8 +374,8 @@ public class ExamService {
     }
 
     public static class ConflictResult {
-        private boolean conflictFree;
-        private List<Conflict> conflicts;
+        private final boolean conflictFree;
+        private final List<Conflict> conflicts;
 
         public ConflictResult(boolean conflictFree, List<Conflict> conflicts) {
             this.conflictFree = conflictFree;

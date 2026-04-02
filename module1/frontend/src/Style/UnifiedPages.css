@@ -425,6 +425,15 @@ body.dark .stat-card {
     }
 }
 
+@media (max-width: 800px) {
+    .page {
+        width: calc(100% - 16px);
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+    }
+}
+
 @media (max-width: 600px) {
     .page {
         padding: 1rem;

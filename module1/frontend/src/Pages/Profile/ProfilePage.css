@@ -4,11 +4,11 @@
 
 .profile-page {
     height: auto;
-    padding: 2rem !important;
+    padding: 1rem !important;
     /* Add padding around the whole page */
-    max-width: 100% !important;
+    max-width: none !important;
     margin: 0 auto;
-    width: 100%;
+    width: 91%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -22,7 +22,7 @@
 .profile-twitter-container {
     background: var(--containerColor, #fff);
     border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
     overflow: visible;
     position: relative;
     width: 100%;
@@ -31,15 +31,14 @@
     margin: 0;
     min-height: auto;
     padding-bottom: 2rem;
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    border: 1px solid rgba(203, 213, 225, 0.75);
     display: flex;
     flex-direction: column;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .profile-twitter-container:hover {
-    border-color: color-mix(in srgb, var(--accentColor, #6366f1), transparent 60%);
-    box-shadow: 0 4px 20px color-mix(in srgb, var(--accentColor, #6366f1), transparent 75%), 0 0 0 1px color-mix(in srgb, var(--accentColor, #6366f1), transparent 85%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
 }
 
 /* --- Account Details Card --- */
@@ -344,14 +343,14 @@ body.dark .cover-photo-menu-item {
 
 .profile-edit-btn {
     padding: 0.6rem 1.4rem;
-    border-radius: 9999px;
+    border-radius: 8px;
     border: 2px solid var(--borderColor, #e2e8f0);
     background: transparent;
     color: var(--textColor, #0f1419);
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     letter-spacing: 0.01em;
     margin-bottom: 10px;
 }
@@ -360,7 +359,12 @@ body.dark .cover-photo-menu-item {
     background: rgba(15, 20, 25, 0.05);
     /* Slight dark hover */
     border-color: var(--textColor, #0f1419);
-    transform: translateY(-1px);
+    transform: none;
+}
+
+.profile-edit-btn:focus,
+.profile-edit-btn:active {
+    transform: none;
 }
 
 .profile-cancel-btn {
@@ -626,6 +630,10 @@ body.dark .profile-bio-input {
     gap: 1.5rem;
 }
 
+.profile-form .form-row:first-child {
+    grid-template-columns: 1fr;
+}
+
 .profile-form .form-group {
     display: flex;
     flex-direction: column;
@@ -681,7 +689,7 @@ body.dark .profile-bio-input {
    ======================================== */
 body.dark .profile-twitter-container {
     background: var(--bg-card, #16181c);
-    border-color: rgba(255, 255, 255, 0.08);
+    border: none;
 }
 
 /* Professional Empty Banner - Dark Mode */
@@ -748,6 +756,16 @@ body.dark .profile-logout-section {
     }
 }
 
+@media (max-width: 800px) {
+    .profile-page {
+        width: calc(100% - 16px);
+        padding: 0.05rem !important;
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+    }
+}
+
 @media (max-width: 600px) {
     .profile-cover-banner {
         height: 150px;
@@ -779,23 +797,33 @@ body.dark .profile-logout-section {
     .profile-details-card {
         padding: 1rem;
     }
+
+    .profile-photo-menu {
+        left: 0;
+        transform: none;
+        min-width: 200px;
+    }
+
+    .cover-photo-menu-item {
+        padding-left: 1.2rem;
+    }
 }
 
 /* --- Edit Profile Button (Reference Match) --- */
 .profile-edit-btn {
-    background-color: #ffffff;
+    background-color: #e5e7eb;
     color: #0f1419;
-    border: 1px solid #cfd9de;
+    border: 1px solid #e5e7eb;
     height: 36px;
     padding: 0 16px;
-    border-radius: 9999px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     line-height: 20px;
 }
 
@@ -806,8 +834,8 @@ body.dark .profile-logout-section {
 }
 
 .profile-edit-btn:hover {
-    background-color: rgba(15, 20, 25, 0.1);
-    border-color: #cfd9de;
+    background-color: #d9dde3;
+    border-color: #d9dde3;
 }
 
 
@@ -895,6 +923,12 @@ body.dark .profile-edit-btn {
 body.dark .profile-edit-btn:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: var(--textColor2, #94a3b8);
+    transform: none;
+}
+
+body.dark .profile-edit-btn:focus,
+body.dark .profile-edit-btn:active {
+    transform: none;
 }
 
 body.dark .profile-logout-btn {

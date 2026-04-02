@@ -298,10 +298,11 @@ const DocsPage = () => {
 
                     <p>The Dashboard serves as the central hub of the application. It provides a quick overview of system status, upcoming exams, and recent activities.</p>
 
-                    <h3>1. Overview & Quick Actions</h3>
+                    <h3>1. Header & Workflow</h3>
                     <ul>
-                        <li><strong>Welcome Section:</strong> Personalized greeting with a <strong>+ New Schedule</strong> button for quick access.</li>
-                        <li><strong>Stats Cards:</strong> Real-time counts for <strong>Subjects</strong>, <strong>Exams</strong>, <strong>Drafts</strong>, and <strong>Published</strong> schedules.</li>
+                        <li><strong>Welcome Card:</strong> Shows the title, a short summary, and the <strong>+ New Schedule</strong> button.</li>
+                        <li><strong>Workflow Panel:</strong> Shows three stages: <strong>Subjects</strong>, <strong>Draft</strong>, and <strong>Published</strong>.</li>
+                        <li><strong>Stage Metrics:</strong> Displays live counts for subjects, drafts, and published timetables.</li>
                     </ul>
 
                     <div className="docs-info-card">
@@ -310,27 +311,25 @@ const DocsPage = () => {
                             <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
                         </svg>
                         <div className="docs-info-card-content">
-                            <h4>Data Insights</h4>
+                            <h4>Workflow Status</h4>
                             <p>
-                                <strong>Drafts</strong> are schedules in progress. <strong>Published</strong> exams are finalized and visible to students.
+                                The status indicator summarizes pipeline progress (for example, <strong>All stages complete</strong>) based on current publishing state.
                             </p>
                         </div>
                     </div>
 
-                    <h3>2. Workflow Tracker</h3>
-                    <p>A visual progress bar tracking the exam scheduling process:</p>
+                    <h3>2. Recent Activity</h3>
                     <ul>
-                        <li><strong>Subjects:</strong> Number of loaded subjects.</li>
-                        <li><strong>Draft:</strong> Exams currently in the planning stage.</li>
-                        <li><strong>Published:</strong> Finalized exams visible to students.</li>
+                        <li><strong>Activity Table:</strong> Lists recently updated exams in a compact view.</li>
+                        <li><strong>Columns:</strong> Shows key fields like <strong>Date</strong>, <strong>Course</strong>, and <strong>Sem</strong>.</li>
+                        <li><strong>View All:</strong> Quick access to the full timetable activity list.</li>
                     </ul>
 
-                    <h3>3. Widgets & Insights</h3>
+                    <h3>3. Insights & System Health</h3>
                     <ul>
-                        <li><strong>My Profile:</strong> Displays user details (Name, Role, Dept) and a link to the full profile.</li>
-                        <li><strong>System Status:</strong> Real-time indicators for <strong>System API</strong> and <strong>Database</strong> connectivity.</li>
-                        <li><strong>Recent Activity:</strong> A log of recently updated courses and exams.</li>
-                        <li><strong>Insights:</strong> Graphical representation of data, such as <strong>Semester Distribution</strong>.</li>
+                        <li><strong>Insights:</strong> Graphical chart for <strong>Semester Distribution</strong> based on current exam data.</li>
+                        <li><strong>System API:</strong> Live connectivity indicator (for example, <strong>ONLINE</strong> or <strong>OFFLINE</strong>).</li>
+                        <li><strong>Database:</strong> Live database state indicator (for example, <strong>ACTIVE</strong> or <strong>ERROR</strong>).</li>
                     </ul>
 
 
@@ -426,17 +425,27 @@ const DocsPage = () => {
 
                 <section id="profile" className={`docs-section ${activeSection === 'profile' ? 'active' : ''}`}>
                     <h2>Profile</h2>
-                    <p>Manage your user account details, update personal information, and view your role permissions.</p>
+                    <p>The Profile page lets you view and edit your personal account information.</p>
 
-                    <p>The <strong>Account Details</strong> section allows you to view and manage the following information:</p>
+                    <h3>1. Profile Overview</h3>
                     <ul>
-                        <li><strong>Name:</strong> Your full name displayed across the platform.</li>
-                        <li><strong>Username:</strong> Unique identifier for logging in and mentions.</li>
-                        <li><strong>Designation:</strong> Your professional title (e.g., Associate Professor).</li>
-                        <li><strong>Department:</strong> The academic department you belong to (e.g., CSE).</li>
+                        <li><strong>Cover & Avatar:</strong> Your cover photo and profile photo are shown at the top.</li>
+                        <li><strong>Identity:</strong> Displays your name, bio, and profile badges like designation and department.</li>
+                        <li><strong>Edit Profile Button:</strong> Switches the page into <strong>Editing Mode</strong>.</li>
+                    </ul>
 
-                        <li><strong>Email Address:</strong> Registered email for account recovery and communication.</li>
-                        <li><strong>Profile & Cover Photos:</strong> You can <strong>Upload</strong>, <strong>Remove</strong>, and <strong>Reposition</strong> both your profile and cover images to personalize your account.</li>
+                    <h3>2. Editing Mode</h3>
+                    <ul>
+                        <li><strong>Cover Photo:</strong> Add, upload, remove, and reposition the cover image.</li>
+                        <li><strong>Profile Photo:</strong> Upload or remove your profile photo and adjust its position.</li>
+                        <li><strong>Bio Editing:</strong> Update your bio with a character limit counter.</li>
+                    </ul>
+
+                    <h3>3. Account Details Form</h3>
+                    <ul>
+                        <li><strong>Fields:</strong> Name, Designation, Department, Phone Number, and Email Address.</li>
+                        <li><strong>Required:</strong> Name and Email are mandatory fields.</li>
+                        <li><strong>Actions:</strong> Use <strong>Cancel</strong> or <strong>Save Changes</strong> to discard or apply updates.</li>
                     </ul>
 
                     <div className="alert-box tip">
@@ -445,7 +454,7 @@ const DocsPage = () => {
                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
                         <div>
-                            <strong>Get Verified:</strong> Link your phone number to earn a <strong>Blue Tick</strong> badge, establishing your profile&apos;s authenticity and trust.
+                            <strong>Tip:</strong> Add both profile and cover photos to make your profile easy to identify.
                         </div>
                     </div>
                 </section>
@@ -543,9 +552,6 @@ const DocsPage = () => {
                     </div>
                 </section>
 
-                <footer className="docs-footer">
-                    Built with passion for innovation and excellence.
-                </footer>
             </main >
         </div >
     );

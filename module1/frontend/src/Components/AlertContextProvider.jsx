@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // AlertContext.js
 import { createContext, useState, useContext, useCallback, useMemo } from 'react';
 
@@ -16,6 +17,16 @@ export const useAlert = () => {
 
 export const AlertProvider = ({ children }) => {
     const [alert, setAlert] = useState({ message: '', type: '', show: false });
+
+    const hideAlert = useCallback(() => {
+        setAlert((prev) => ({ ...prev, show: false }));
+    }, []);
+
+    const autoCloseAlert = useMemo(() => {
+        return () => {
+            setTimeout(hideAlert, 2000);
+        };
+    }, [hideAlert]);
 
     const showWarning = (message) => {
         setAlert({ message, type: 'warning', show: true });
@@ -36,24 +47,6 @@ export const AlertProvider = ({ children }) => {
         setAlert({ message, type, show: true });
         autoCloseAlert();
     };
-
-    const hideAlert = () => {
-        setAlert({ ...alert, show: false });
-    };
-
-    const deboucer = useCallback((func, delay) => {
-        let timer = null;
-        return function () {
-            if (timer !== null) clearTimeout(timer);
-            timer = setTimeout(() => {
-                func();
-            }, delay);
-        }
-    }, [])
-
-    const autoCloseAlert = useMemo(() => deboucer(() => {
-        hideAlert();
-    }, 2000), [deboucer]);
 
     return (
         <AlertContext.Provider value={{ alert, showAlert, hideAlert, showWarning, showSuccess, showError }}>

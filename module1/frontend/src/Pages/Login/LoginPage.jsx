@@ -11,7 +11,7 @@ import UserIcon from '../../Icons/User';
 import LockIcon from '../../Icons/Lock';
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +34,7 @@ function LoginPage() {
             const response = await fetch(`${url}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username: email, password })
             });
 
             const data = await response.json();
@@ -45,7 +45,7 @@ function LoginPage() {
             } else {
                 setError('Invalid login, please try again');
             }
-        } catch (err) {
+        } catch {
             setError('Server connection error. Is the backend running?');
         } finally {
             setIsLoading(false);
@@ -66,14 +66,14 @@ function LoginPage() {
                     <div className="form-group">
                         <div className="input-wrapper">
                             <input
-                                type="text"
-                                id="username"
-                                placeholder="Username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                type="email"
+                                id="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
-                            {!username && <UserIcon className="input-icon" size={20} />}
+                            {!email && <UserIcon className="input-icon" size={20} />}
                         </div>
                     </div>
 
@@ -112,7 +112,7 @@ function LoginPage() {
                 </form>
 
                 <div className="login-footer">
-                    <p className="signup-prompt">Don't have an account? <Link to="/register" className="signup-link">Sign up</Link></p>
+                    <p className="signup-prompt">Don&apos;t have an account? <Link to="/register" className="signup-link">Sign up</Link></p>
                 </div>
             </div>
         </div>

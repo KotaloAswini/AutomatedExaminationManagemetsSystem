@@ -1,20 +1,41 @@
 package com.example.timetable.controller;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.timetable.model.User;
 import com.example.timetable.repository.UserRepository;
 import com.example.timetable.service.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
+
+    private static final Set<String> ALLOWED_SCHEDULER_EMAILS = Set.of(
+            "nagaratna.p@nmit.ac.in",
+            "uma.r@nmit.ac.in",
+            "1nt22cs098.lalan@nmit.ac.in",
+            "1nt22cs092.kotalo@nmit.ac.in");
+
+    private boolean isBlockedInstitutionEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+        String normalized = email.trim().toLowerCase();
+        return normalized.endsWith("@nmit.ac.in") && !ALLOWED_SCHEDULER_EMAILS.contains(normalized);
+    }
 
     @Autowired
     private UserRepository userRepository;
@@ -27,6 +48,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
+        if (isBlockedInstitutionEmail(user.getEmail())) {
+            return ResponseEntity.status(400).body(Map.of(
+                    "error",
+                    "Only authorized @nmit.ac.in emails are permitted. Please use a personal email."));
+        }
+
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return ResponseEntity.status(400).body(Map.of("error", "Email already registered"));
         }
@@ -122,6 +149,11 @@ public class AuthController {
             user.setUsername(updatedUser.getUsername());
             user.setProfilePicture(updatedUser.getProfilePicture());
             if (updatedUser.getEmail() != null && !updatedUser.getEmail().isEmpty()) {
+                if (isBlockedInstitutionEmail(updatedUser.getEmail())) {
+                    return ResponseEntity.status(400).body(Map.of(
+                            "error",
+                            "Only authorized @nmit.ac.in emails are permitted. Please use a personal email."));
+                }
                 user.setEmail(updatedUser.getEmail());
             }
             user.setBio(updatedUser.getBio());
@@ -143,6 +175,11 @@ public class AuthController {
 
         Optional<User> userOpt = userRepository.findByUsernameOrEmail(username, username);
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
+            if (isBlockedInstitutionEmail(userOpt.get().getEmail())) {
+                return ResponseEntity.status(403).body(Map.of(
+                        "error",
+                        "This institutional email is not authorized. Please use an approved institutional email or a personal email."));
+            }
             return ResponseEntity.ok(userOpt.get());
         }
 

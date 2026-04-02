@@ -3,12 +3,13 @@
    ======================================== */
 
 .settings-page {
-    /* Full width/height for the scrollbar container */
-    padding: 0;
+    padding: 1rem 1.5rem;
     max-width: 100%;
     margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
-    /* Ensure it fills the available viewport height to scroll properly */
     height: 100%;
     min-height: 0;
 }
@@ -19,10 +20,10 @@
     flex-direction: column;
     gap: 1.5rem;
     max-width: 800px;
-    /* Slightly less than page max-width for cleaner look, or match 1400px */
     width: 100%;
     margin: 0 auto;
-    padding: 1.5rem 1rem;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Combined Card Styles */
@@ -31,10 +32,15 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    max-width: 730px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .settings-section {
     padding: 1.5rem;
+    box-sizing: border-box;
 }
 
 .about-section-link {
@@ -78,6 +84,7 @@
     border-radius: 14px;
     padding: 1.25rem;
     border: 1px solid rgba(226, 232, 240, 0.8);
+    box-sizing: border-box;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -128,108 +135,206 @@
 
 
 
-/* ========== Theme Switcher ========== */
-.theme-switcher {
-    display: flex;
-    gap: 0.75rem;
-    background: var(--hoverColor, #f1f5f9);
-    border-radius: 12px;
-    padding: 0.4rem;
+/* ========== Appearance Controls ========== */
+.appearance-title,
+.accent-title {
+    margin: 0 0 1rem 0;
+    color: var(--textColor, #111827);
+    font-size: 18px !important;
+    line-height: 1.1 !important;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-shadow: none;
 }
 
-.theme-btn {
-    flex: 1;
-    display: flex;
+.appearance-card {
+    --appearance-inline-inset: 3%;
+    max-width: 730px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.appearance-card .appearance-title {
+    padding-left: var(--appearance-inline-inset);
+    padding-right: var(--appearance-inline-inset);
+}
+
+.background-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+}
+
+.background-option {
+    height: 64px;
+    width: 100%;
+    justify-self: stretch;
+    border-radius: 4px;
+    border: 2px solid #e5e7eb;
+    background: #ffffff;
+    display: grid;
+    grid-template-columns: 21px 1fr 21px;
+    column-gap: 0.7rem;
+    align-items: center;
+    padding: 0 1.05rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.background-option.active {
+    border-color: var(--accentColor, #6d4dff);
+}
+
+.background-option.lights-out {
+    background: #000000;
+    border-color: #000000;
+}
+
+.background-option.lights-out.active {
+    border-color: var(--accentColor, #6d4dff);
+}
+
+.background-option .background-label {
+    text-align: center;
+    font-size: 15px !important;
+    font-weight: 600;
+    color: #111827;
+}
+
+.background-spacer {
+    width: 21px;
+    height: 21px;
+    display: inline-block;
+}
+
+.background-option.lights-out .background-label {
+    color: #f8fafc;
+}
+
+.background-radio {
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    border: 2px solid #9fb3c4;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1rem;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--textColor2, #64748b);
-    font-size: 0.9rem;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.background-radio.checked {
+    border-color: var(--accentColor, #6d4dff);
+    background: var(--accentColor, #6d4dff);
+}
+
+.background-radio svg {
+    width: 12px;
+    height: 12px;
+}
+
+.system-setting-row {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: var(--appearance-inline-inset);
+    padding-right: var(--appearance-inline-inset);
+}
+
+.system-setting-label {
+    color: #1f2937;
+    font-size: 14px !important;
     font-weight: 500;
+}
+
+.system-setting-toggle {
+    width: 56px;
+    height: 30px;
+    border: 0;
+    border-radius: 999px;
+    background: #a3a3a3;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
     cursor: pointer;
-    transition: all 0.25s ease;
 }
 
-.theme-btn svg {
-    width: 18px;
-    height: 18px;
-    stroke: currentColor;
-    fill: none;
+.system-setting-toggle.active {
+    background: var(--accentColor, #6d4dff);
 }
 
-.theme-btn:hover {
-    background: var(--containerColor, #ffffff);
-    color: var(--textColor, #334155);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+.system-setting-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
 }
 
-.theme-btn.active {
-    background: var(--containerColor, #ffffff);
-    color: var(--accentColor, #6366f1);
-    border-color: var(--accentColor, #6366f1);
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--accentColor, #6366f1), transparent 80%);
-    font-weight: 600;
+.system-setting-toggle.active .system-setting-thumb {
+    transform: translateX(26px);
 }
 
-.theme-btn.active svg {
-    stroke: var(--accentColor, #6366f1);
-    color: var(--accentColor, #6366f1);
-}
-
-.card-header-icon.accent-icon {
-    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-}
-
-.card-header-icon.accent-icon svg {
-    stroke: #16a34a;
-    color: #16a34a;
+.system-setting-desc {
+    margin: 0.8rem 0 0 0;
+    color: #64748b;
+    font-size: 13px !important;
+    font-weight: 500;
+    padding-left: var(--appearance-inline-inset);
+    padding-right: var(--appearance-inline-inset);
 }
 
 /* Accent Picker */
 .accent-picker {
     display: flex;
-    gap: 1rem;
-    justify-content: center;
-    padding: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.1rem;
+    padding: 0;
+    margin-top: 0;
 }
 
 .accent-btn {
-    width: 32px;
-    height: 32px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    border: 3px solid transparent;
+    border: 0;
+    appearance: none;
+    -webkit-appearance: none;
     background-color: var(--bg-accent);
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    box-shadow: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
 }
 
 .accent-btn:hover {
-    transform: scale(1.15);
+    transform: scale(1.02);
 }
 
 .accent-btn.active {
-    border-color: var(--textColor);
-    transform: scale(1.1);
-    box-shadow: 0 0 0 2px var(--containerColor), 0 0 0 4px var(--bg-accent);
+    transform: none;
 }
 
-.theme-hint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.82rem;
-    color: var(--textColor2, #94a3b8);
-    margin: 1rem 0 0 0;
-    font-weight: 500;
+.accent-btn:focus,
+.accent-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accentColor, #6366f1), transparent 65%);
 }
 
-
+.accent-check {
+    width: 22px;
+    height: 22px;
+}
 
 /* ========================================
    Dark Mode Overrides
@@ -313,44 +418,64 @@ body.dark .card-header-icon svg {
     color: #a78bfa;
 }
 
-
-
-body.dark .card-header-icon.accent-icon {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.15));
+body.dark .appearance-title,
+body.dark .accent-title {
+    color: #f8fafc;
 }
 
-body.dark .card-header-icon.accent-icon svg {
-    stroke: #34d399;
-    color: #34d399;
+body.dark .background-option {
+    background: #f4f4f5;
+    border-color: #e5e7eb;
 }
 
-body.dark .theme-switcher {
-    background: #0f172a;
+body.dark .background-option .background-label {
+    color: #111827;
 }
 
-body.dark .theme-btn {
-    color: #94a3b8;
+body.dark .background-option.lights-out .background-label {
+    color: #f8fafc;
 }
 
-body.dark .theme-btn:hover {
-    background: #1e293b;
+body.dark .background-option.active {
+    border-color: var(--accentColor, #8b5cf6);
+}
+
+body.dark .background-option.lights-out {
+    background: #000000;
+    border-color: #000000;
+}
+
+body.dark .background-option.lights-out.active {
+    border-color: var(--accentColor, #8b5cf6);
+}
+
+body.dark .background-radio {
+    border-color: #475569;
+}
+
+body.dark .background-radio.checked {
+    border-color: var(--accentColor, #8b5cf6);
+    background: var(--accentColor, #8b5cf6);
+}
+
+body.dark .system-setting-label {
     color: #e2e8f0;
 }
 
-body.dark .theme-btn.active {
-    background: #1e293b;
-    color: #a78bfa;
-    border-color: #a78bfa;
-    box-shadow: 0 2px 8px rgba(167, 139, 250, 0.2);
+body.dark .system-setting-toggle {
+    background: #475569;
 }
 
-body.dark .theme-btn.active svg {
-    stroke: #a78bfa;
-    color: #a78bfa;
+body.dark .system-setting-toggle.active {
+    background: var(--accentColor, #8b5cf6);
 }
 
-body.dark .theme-hint {
-    color: #64748b;
+body.dark .system-setting-thumb {
+    background: #e2e8f0;
+}
+
+body.dark .system-setting-desc {
+    color: #94a3b8;
 }
 
 
@@ -359,20 +484,109 @@ body.dark .theme-hint {
    Responsive
    ======================================== */
 
-@media (max-width: 640px) {
+@media (max-width: 800px) {
     .settings-page {
-        padding: 1rem;
-    }
-
-
-
-    .theme-switcher {
-        flex-direction: column;
+        padding: calc(env(safe-area-inset-top, 0px) + 3.35rem) 0.75rem 0.75rem;
     }
 
     .settings-container {
+        gap: 1rem;
+        max-width: 100%;
+    }
+
+    .appearance-card,
+    .combined-card {
+        max-width: 100%;
+        width: calc(100% - 16px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .settings-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .settings-section {
         padding: 1rem;
     }
 
+    .appearance-title,
+    .accent-title {
+        font-size: 1.1rem !important;
+    }
+
+    .background-options {
+        grid-template-columns: 1fr;
+    }
+
+    .background-option {
+        height: 58px;
+        padding: 0 0.85rem;
+    }
+
+    .background-option .background-label {
+        font-size: 0.95rem !important;
+    }
+
+    .system-setting-label {
+        font-size: 0.95rem !important;
+    }
+
+    .system-setting-desc {
+        font-size: 0.85rem !important;
+    }
+
+    .accent-picker {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.75rem;
+    }
+
+    .accent-btn {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+    }
+
+    .about-section-link .card-header-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-page {
+        padding: calc(env(safe-area-inset-top, 0px) + 3.15rem) 0.65rem 0.65rem;
+    }
+
+    .settings-card {
+        padding: 0.9rem;
+    }
+
+    .settings-section {
+        padding: 0.9rem;
+    }
+
+    .system-setting-row {
+        margin-top: 1.1rem;
+    }
+
+    .system-setting-toggle {
+        width: 52px;
+        height: 28px;
+    }
+
+    .system-setting-thumb {
+        width: 22px;
+        height: 22px;
+    }
+
+    .system-setting-toggle.active .system-setting-thumb {
+        transform: translateX(24px);
+    }
 
 }

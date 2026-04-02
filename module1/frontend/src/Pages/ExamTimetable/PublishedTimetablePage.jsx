@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState, useCallback } from 'react';
 import '../../Style/Pages/ExamTimetablePage.css';
 import { useAlert } from '../../Components/AlertContextProvider';
+import { useAuth } from '../../Components/AuthContext';
 import { useConfirm } from '../../Components/ConfirmContextProvider';
 import {
     getExams,
@@ -18,9 +19,11 @@ import ExamTimetableIcon from '../../Icons/ExamTimetableIcon';
 import Printer from '../../Icons/Printer';
 import Download from '../../Icons/Download';
 
-import { TIME_SLOTS, SEMESTERS, DEPARTMENTS } from '../../Script/Constants';
+import { TIME_SLOTS, SEMESTERS, DEPARTMENTS, canScheduleTimetable } from '../../Script/Constants';
 
 function PublishedTimetablePage() {
+    const { user } = useAuth();
+    const isCoordinator = canScheduleTimetable(user?.email);
     const { showError, showSuccess } = useAlert();
     const { showErrorConfirm } = useConfirm();
     const [exams, setExams] = useState([]);
@@ -294,7 +297,7 @@ function PublishedTimetablePage() {
                         const long = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toLowerCase();
                         if (long.includes(query)) return true;
                     }
-                } catch (e) { /* ignore */ }
+                } catch { /* ignore */ }
             }
             return false;
         })
@@ -375,7 +378,7 @@ function PublishedTimetablePage() {
                             ref={searchRef}
                             type="text"
                             className="exam-search-input"
-                            placeholder="Search or jump to..."
+                            placeholder="Start typing..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Escape' && e.target.blur()}
@@ -400,12 +403,12 @@ function PublishedTimetablePage() {
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Time</th>
+                                    <th className='time-col'>Time</th>
                                     <th>Exam Type</th>
                                     <th>Department</th>
                                     <th>Semester</th>
-                                    <th>Course</th>
-                                    <th>ACTIONS</th>
+                                    <th className='course-col'>Course</th>
+                                    {isCoordinator && <th>ACTIONS</th>}
                                 </tr>
                             </thead>
                             <tbody>
@@ -425,31 +428,33 @@ function PublishedTimetablePage() {
                                                         })()}
                                                     </td>
                                                 )}
-                                                <td>{formatTo12Hour(exam.startTime)} - {formatTo12Hour(exam.endTime)}</td>
+                                                <td className='time-cell'>{formatTo12Hour(exam.startTime)} - {formatTo12Hour(exam.endTime)}</td>
                                                 <td style={{ textAlign: 'center' }}><span className='exam-type-badge'>{exam.examType || '-'}</span></td>
                                                 <td><span className='dept-badge'>{exam.department || 'N/A'}</span></td>
                                                 <td><span className='sem-badge'>SEM {exam.semester}</span></td>
-                                                <td>{exam.courseName}</td>
-                                                <td>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                                                        <button
-                                                            className='btn-icon'
-                                                            title='Edit Exam'
-                                                            onClick={() => handleEdit(exam)}
-                                                            style={{ width: '32px', height: '32px', padding: '6px' }}
-                                                        >
-                                                            <EditIcon width={16} height={16} />
-                                                        </button>
-                                                        <button
-                                                            className='btn-icon delete'
-                                                            title='Delete Exam'
-                                                            onClick={() => handleDelete(exam.id)}
-                                                            style={{ width: '32px', height: '32px', padding: '6px' }}
-                                                        >
-                                                            <Trash width={16} height={16} fill="currentColor" />
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                <td className='course-cell'>{exam.courseName}</td>
+                                                {isCoordinator && (
+                                                    <td>
+                                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                                            <button
+                                                                className='btn-icon'
+                                                                title='Edit Exam'
+                                                                onClick={() => handleEdit(exam)}
+                                                                style={{ width: '32px', height: '32px', padding: '6px' }}
+                                                            >
+                                                                <EditIcon width={16} height={16} />
+                                                            </button>
+                                                            <button
+                                                                className='btn-icon delete'
+                                                                title='Delete Exam'
+                                                                onClick={() => handleDelete(exam.id)}
+                                                                style={{ width: '32px', height: '32px', padding: '6px' }}
+                                                            >
+                                                                <Trash width={16} height={16} fill="currentColor" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                )}
                                             </tr>
                                         ))
                                     )}

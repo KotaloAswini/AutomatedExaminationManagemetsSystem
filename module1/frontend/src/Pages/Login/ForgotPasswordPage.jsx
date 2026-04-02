@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../../Components/AuthContext';
 import { url } from '../../Script/fetchUrl';
 import EyeIcon from '../../Icons/Eye';
 import './Login.css';
@@ -46,7 +45,7 @@ function ForgotPasswordPage() {
                 const data = await response.json();
                 setError(data.error || 'Failed to send reset link');
             }
-        } catch (err) {
+        } catch {
             setError('Server connection error. Is the backend running?');
         } finally {
             setIsLoading(false);

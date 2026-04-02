@@ -1,6 +1,7 @@
 .page.exam-timetable {
     padding: 1rem;
-    max-width: 98%;
+    width: 91%;
+    max-width: none;
     margin: 0 auto;
     flex-direction: column;
     /* Ensure header stays at top */
@@ -1179,6 +1180,20 @@ body.dark .exam-table-container::-webkit-scrollbar-thumb:hover {
     white-space: nowrap;
 }
 
+@media (min-width: 801px) {
+    .page.exam-timetable.student-view .exam-table th:first-child,
+    .page.exam-timetable.student-view .exam-table td.date-cell {
+        width: 90px;
+        min-width: 90px;
+    }
+
+    .page.exam-timetable.student-view .exam-table th.time-col,
+    .page.exam-timetable.student-view .exam-table td.time-cell {
+        width: 128px;
+        min-width: 128px;
+    }
+}
+
 .hall-cell {
     font-family: 'Outfit', sans-serif;
     font-weight: 400;
@@ -1341,6 +1356,37 @@ body.dark .exam-table-container::-webkit-scrollbar-thumb:hover {
     }
 }
 
+@media (max-width: 800px) {
+    .page.exam-timetable {
+        width: calc(100% - 16px);
+        padding: 0.05rem;
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+    }
+
+    .exam-search-container {
+        height: 40px;
+        padding: 0 10px 0 14px;
+    }
+
+    .exam-search-shortcut {
+        height: 26px;
+        min-width: 26px;
+    }
+
+    .page.exam-timetable.student-view .exam-table th.time-col,
+    .page.exam-timetable.student-view .exam-table td.time-cell {
+        min-width: 110px;
+        white-space: nowrap;
+    }
+
+    .page.exam-timetable.student-view .exam-table th.course-col,
+    .page.exam-timetable.student-view .exam-table td.course-cell {
+        min-width: 240px;
+    }
+}
+
 @media (max-width: 600px) {
     .page.exam-timetable .page-title {
         font-size: clamp(1rem, 5vw, 1.3rem);
@@ -1351,11 +1397,6 @@ body.dark .exam-table-container::-webkit-scrollbar-thumb:hover {
         max-width: 100%;
         gap: 0.5rem;
         /* Reduce gap to fit more text */
-    }
-
-    .page.exam-timetable {
-        padding: 0.75rem;
-        /* Reduce padding slightly */
     }
 
     .page.exam-timetable .title-icon {

@@ -86,11 +86,22 @@ function ExamTimetablePage() {
     const { showErrorConfirm } = useConfirm();
     const location = useLocation();
 
+    const loadExams = useCallback(async () => {
+        const data = await getExams(filterSemester, filterDepartment || undefined, 'DRAFT');
+        setExams(data);
+    }, [filterSemester, filterDepartment]);
+
+    const loadConflicts = useCallback(async () => {
+        const result = await checkConflicts(filterSemester, filterDepartment || undefined);
+        setConflicts(result.conflicts);
+        setIsConflictFree(result.conflictFree);
+    }, [filterSemester, filterDepartment]);
+
     // Load initial data
     useEffect(() => {
         loadExams();
         getSubjectsDetailsList(data => setSubjectsDetails(data));
-    }, []);
+    }, [loadExams]);
 
     // Check for edit state from navigation
     useEffect(() => {
@@ -103,11 +114,6 @@ function ExamTimetablePage() {
         }
     }, [location.state]);
 
-    // Reload when filters change
-    useEffect(() => {
-        loadExams();
-    }, [filterSemester, filterDepartment]);
-
     useEffect(() => {
         localStorage.setItem('testCoordinator', testCoordinator);
     }, [testCoordinator]);
@@ -115,18 +121,7 @@ function ExamTimetablePage() {
     // Check conflicts whenever exams change
     useEffect(() => {
         loadConflicts();
-    }, [exams]);
-
-    const loadExams = async () => {
-        const data = await getExams(filterSemester, filterDepartment || undefined, 'DRAFT');
-        setExams(data);
-    };
-
-    const loadConflicts = async () => {
-        const result = await checkConflicts(filterSemester, filterDepartment || undefined);
-        setConflicts(result.conflicts);
-        setIsConflictFree(result.conflictFree);
-    };
+    }, [exams, loadConflicts]);
 
     const handleScheduleExam = useCallback(async () => {
         const isConnected = await checkDbConnection();
@@ -222,7 +217,7 @@ function ExamTimetablePage() {
             },
             showError
         );
-    }, [editingExam, examDate, selectedTimeSlot, hallId, showError, showSuccess, loadExams]);
+    }, [editingExam, examDate, selectedTimeSlot, hallId, selectedSemester, selectedDepartment, selectedCourse, testCoordinator, examType, showError, showSuccess, loadExams]);
 
     const handleDeleteExam = useCallback((id) => {
 
@@ -409,7 +404,7 @@ function ExamTimetablePage() {
                             ref={searchRef}
                             type="text"
                             className="exam-search-input"
-                            placeholder="Search or jump to..."
+                            placeholder="Start typing..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Escape' && e.target.blur()}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../Components/AuthContext';
 import { useAlert } from '../../Components/AlertContextProvider';
 import { url } from '../../Script/fetchUrl';
@@ -6,17 +6,46 @@ import '../../Style/UnifiedPages.css';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
-    const { user, updateUser, logout } = useAuth();
+    const { user, updateUser } = useAuth();
+    
+    // Helper to extract pos from custom string format: base64#meta={...}
+    const extractPhotoData = (photoStr) => {
+        if (!photoStr) return { url: '', pos: { x: 50, y: 50 }, zoom: 1 };
+        const parts = photoStr.split('#meta=');
+        if (parts.length > 1) {
+            try {
+                const meta = JSON.parse(decodeURIComponent(parts[1]));
+                return { url: parts[0], pos: meta.pos || { x: 50, y: 50 }, zoom: meta.zoom || 1 };
+            } catch {
+                return { url: parts[0], pos: { x: 50, y: 50 }, zoom: 1 };
+            }
+        }
+        // Fallback for previous '|meta=' logic just in case there's old data
+        const oldParts = photoStr.split('|meta=');
+        if (oldParts.length > 1) {
+            try {
+                const meta = JSON.parse(oldParts[1]);
+                return { url: oldParts[0], pos: meta.pos || { x: 50, y: 50 }, zoom: meta.zoom || 1 };
+            } catch {
+                return { url: oldParts[0], pos: { x: 50, y: 50 }, zoom: 1 };
+            }
+        }
+        return { url: photoStr, pos: { x: 50, y: 50 }, zoom: 1 };
+    };
+
+    const initialCover = extractPhotoData(user?.coverPhoto);
+    const initialProfile = extractPhotoData(user?.profilePicture);
+
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        name: user?.name || '',
         username: user?.username || '',
+        name: user?.name || '',
         email: user?.email || '',
         designation: user?.designation || '',
         department: user?.department || '',
         phoneNumber: user?.phoneNumber || '',
-        profilePicture: user?.profilePicture || '',
-        coverPhoto: user?.coverPhoto || '',
+        profilePicture: initialProfile.url || '',
+        coverPhoto: initialCover.url || '',
         bio: user?.bio || ''
     });
     const [isLoading, setIsLoading] = useState(false);
@@ -24,9 +53,11 @@ const ProfilePage = () => {
 
     // Repositioning State
     const bannerRef = useRef(null);
+    const bioInputRef = useRef(null);
+    const designationInputRef = useRef(null);
     const [isRepositioning, setIsRepositioning] = useState(false);
     const [tempCoverPhoto, setTempCoverPhoto] = useState(null);
-    const [repositionPos, setRepositionPos] = useState({ x: 50, y: 50 }); // Center by default
+    const [repositionPos, setRepositionPos] = useState(initialCover.pos);
     const [isDragging, setIsDragging] = useState(false);
     const dragStart = useRef({ x: 0, y: 0 });
 
@@ -34,8 +65,8 @@ const ProfilePage = () => {
     const profileImageRef = useRef(null);
     const [isRepositioningProfile, setIsRepositioningProfile] = useState(false);
     const [tempProfilePhoto, setTempProfilePhoto] = useState(null);
-    const [profileRepositionPos, setProfileRepositionPos] = useState({ x: 50, y: 50 });
-    const [profileZoom, setProfileZoom] = useState(1);
+    const [profileRepositionPos, setProfileRepositionPos] = useState(initialProfile.pos);
+    const [profileZoom, setProfileZoom] = useState(initialProfile.zoom);
     const [isDraggingProfile, setIsDraggingProfile] = useState(false);
     const profileDragStart = useRef({ x: 0, y: 0 });
 
@@ -44,7 +75,7 @@ const ProfilePage = () => {
     const coverMenuRef = useRef(null);
 
     // Click outside to close menu
-    React.useEffect(() => {
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (coverMenuRef.current && !coverMenuRef.current.contains(event.target)) {
                 setShowCoverMenu(false);
@@ -66,19 +97,16 @@ const ProfilePage = () => {
         return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
     };
 
-    if (!user) return null;
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        // Enforce lowercase, numbers, dots, and underscores only for username field
         if (name === 'username') {
-            const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9._]/g, '');
-            setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
+            const sanitized = value.replace(/[^a-zA-Z0-9_.]/g, '').toLowerCase();
+            setFormData(prev => ({ ...prev, [name]: sanitized }));
             return;
         }
-        // Name: only allow letters and spaces (no numbers, dots, underscores)
+        // Name: only allow letters, spaces, and dots (no numbers, underscores)
         if (name === 'name') {
-            const sanitizedName = value.replace(/[^a-zA-Z\s]/g, '');
+            const sanitizedName = value.replace(/[^a-zA-Z\s.]/g, '');
             setFormData(prev => ({ ...prev, [name]: sanitizedName }));
             return;
         }
@@ -122,14 +150,14 @@ const ProfilePage = () => {
 
     // Drag Logic
     const handleMouseDown = (e) => {
-        if (!isRepositioning) return;
+        if (!isRepositioning && !isEditing) return;
         e.preventDefault();
         setIsDragging(true);
         dragStart.current = { x: e.clientX, y: e.clientY };
     };
 
     const handleMouseMove = (e) => {
-        if (!isDragging || !isRepositioning || !bannerRef.current) return;
+        if (!isDragging || (!isRepositioning && !isEditing) || !bannerRef.current) return;
 
         const deltaX = e.clientX - dragStart.current.x;
         const deltaY = e.clientY - dragStart.current.y;
@@ -162,71 +190,6 @@ const ProfilePage = () => {
         setIsDragging(false);
     };
 
-    const handleSavePosition = () => {
-        if (!bannerRef.current || !tempCoverPhoto) return;
-
-        // Create canvas to crop
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        img.src = tempCoverPhoto;
-
-        img.onload = () => {
-            // Need to simulate background-size: cover logic
-            const bannerRect = bannerRef.current.getBoundingClientRect();
-            canvas.width = bannerRect.width;
-            canvas.height = bannerRect.height;
-
-            const imgRatio = img.width / img.height;
-            const bannerRatio = canvas.width / canvas.height;
-
-            let renderWidth, renderHeight;
-            let offsetX, offsetY;
-
-            // Cover logic
-            if (imgRatio > bannerRatio) {
-                renderHeight = canvas.height;
-                renderWidth = img.width * (canvas.height / img.height);
-            } else {
-                renderWidth = canvas.width;
-                renderHeight = img.height * (canvas.width / img.width);
-            }
-
-            // Position logic based on percentage
-            // pos x% -> (renderWidth - canvas.width) * (x/100) is the part HIDDEN on the left?
-            // Actually: center is (renderWidth - canvasWidth) / 2.
-            // 50% means center. 0% means left aligned (offset 0). 100% means right aligned (offset max).
-
-            // X offset
-            offsetX = (renderWidth - canvas.width) * (repositionPos.x / 100);
-            // Y offset
-            offsetY = (renderHeight - canvas.height) * (repositionPos.y / 100);
-
-            // Draw
-            // drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh) is for source cropping.
-            // Better: draw whole image scaled and shifted.
-            // Negative offset to move image LEFT/UP?
-            // If pos 0% (Left), offset should be 0. We draw at 0.
-            // If pos 100% (Right), we draw at -(renderWidth - canvas.width).
-
-            // Correct formula: drawX = -1 * (renderWidth - canvas.width) * (repositionPos.x / 100)
-            const drawX = -1 * (renderWidth - canvas.width) * (repositionPos.x / 100);
-            const drawY = -1 * (renderHeight - canvas.height) * (repositionPos.y / 100);
-
-            ctx.drawImage(img, drawX, drawY, renderWidth, renderHeight);
-
-            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            setFormData(prev => ({ ...prev, coverPhoto: croppedDataUrl }));
-            setIsRepositioning(false);
-            showSuccess('Cover photo updated!');
-        };
-    };
-
-    const handleCancelReposition = () => {
-        setIsRepositioning(false);
-        setTempCoverPhoto(null);
-    };
-
     const handleRemoveCoverPhoto = () => {
         setFormData(prev => ({ ...prev, coverPhoto: '' }));
         setShowCoverMenu(false);
@@ -236,14 +199,14 @@ const ProfilePage = () => {
 
     // Profile Drag Logic
     const handleProfileMouseDown = (e) => {
-        if (!isRepositioningProfile) return;
+        if (!isRepositioningProfile && !isEditing) return;
         e.preventDefault();
         setIsDraggingProfile(true);
         profileDragStart.current = { x: e.clientX, y: e.clientY };
     };
 
     const handleProfileMouseMove = (e) => {
-        if (!isDraggingProfile || !isRepositioningProfile || !profileImageRef.current) return;
+        if (!isDraggingProfile || (!isRepositioningProfile && !isEditing) || !profileImageRef.current) return;
 
         const deltaX = e.clientX - profileDragStart.current.x;
         const deltaY = e.clientY - profileDragStart.current.y;
@@ -259,10 +222,6 @@ const ProfilePage = () => {
         }));
 
         profileDragStart.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const handleProfileZoomChange = (e) => {
-        setProfileZoom(parseFloat(e.target.value));
     };
 
     const handleProfileMouseUp = () => {
@@ -298,9 +257,11 @@ const ProfilePage = () => {
         };
     }, []);
 
-    const getCroppedImage = () => {
+    if (!user) return null;
+
+    const processImageWithMetadata = (imageSource, pos, zoom = 1) => {
         return new Promise((resolve) => {
-            if (!bannerRef.current || !tempCoverPhoto) {
+            if (!imageSource) {
                 resolve(null);
                 return;
             }
@@ -308,81 +269,40 @@ const ProfilePage = () => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            img.src = tempCoverPhoto;
+            img.crossOrigin = 'anonymous'; // Ensure external images don't taint the canvas
+            img.src = imageSource;
 
             img.onload = () => {
-                const bannerRect = bannerRef.current.getBoundingClientRect();
-                const scale = 3; // Increase resolution (3x for high quality)
-                canvas.width = bannerRect.width * scale;
-                canvas.height = bannerRect.height * scale;
+                // Scale down logic but NO CROPPING. We preserve the original uncropped ratio to allow dragging anytime!
+                const MAX_DIMENSION = 1600;
+                let targetWidth = img.width;
+                let targetHeight = img.height;
 
-                const imgRatio = img.width / img.height;
-                const bannerRatio = canvas.width / canvas.height;
-
-                let renderWidth, renderHeight;
-
-                if (imgRatio > bannerRatio) {
-                    renderHeight = canvas.height;
-                    renderWidth = img.width * (canvas.height / img.height);
-                } else {
-                    renderWidth = canvas.width;
-                    renderHeight = img.height * (canvas.width / img.width);
+                if (Math.max(targetWidth, targetHeight) > MAX_DIMENSION) {
+                    const ratio = MAX_DIMENSION / Math.max(targetWidth, targetHeight);
+                    targetWidth *= ratio;
+                    targetHeight *= ratio;
                 }
 
-                const drawX = -1 * (renderWidth - canvas.width) * (repositionPos.x / 100);
-                const drawY = -1 * (renderHeight - canvas.height) * (repositionPos.y / 100);
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-                ctx.drawImage(img, drawX, drawY, renderWidth, renderHeight);
-                resolve(canvas.toDataURL('image/jpeg', 0.95));
+                const base64Str = canvas.toDataURL('image/jpeg', 0.9);
+                const metadata = JSON.stringify({ pos, zoom });
+                resolve(`${base64Str}#meta=${encodeURIComponent(metadata)}`);
             };
         });
     };
 
+    const getCroppedImage = () => {
+         const source = tempCoverPhoto || formData.coverPhoto;
+         return processImageWithMetadata(source, repositionPos, 1);
+    };
+
     const getCroppedProfileImage = () => {
-        return new Promise((resolve) => {
-            if (!profileImageRef.current || !tempProfilePhoto) {
-                resolve(null);
-                return;
-            }
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.src = tempProfilePhoto;
-
-            img.onload = () => {
-                const rect = profileImageRef.current.getBoundingClientRect();
-                const scale = 3; // Increase resolution for quality
-                canvas.width = rect.width * scale;
-                canvas.height = rect.height * scale;
-
-                const imgRatio = img.width / img.height;
-                const canvasRatio = canvas.width / canvas.height;
-
-                let renderWidth, renderHeight;
-
-                // standard object-cover logic
-                if (imgRatio > canvasRatio) {
-                    renderHeight = canvas.height;
-                    renderWidth = img.width * (canvas.height / img.height);
-                } else {
-                    renderWidth = canvas.width;
-                    renderHeight = img.height * (canvas.width / img.width);
-                }
-
-                // Apply Zoom
-                renderWidth *= profileZoom;
-                renderHeight *= profileZoom;
-
-                const drawX = -1 * (renderWidth - canvas.width) * (profileRepositionPos.x / 100);
-                const drawY = -1 * (renderHeight - canvas.height) * (profileRepositionPos.y / 100);
-
-                ctx.drawImage(img, drawX, drawY, renderWidth, renderHeight);
-
-                // High quality output
-                resolve(canvas.toDataURL('image/jpeg', 0.95));
-            };
-        });
+         const source = tempProfilePhoto || formData.profilePicture;
+         return processImageWithMetadata(source, profileRepositionPos, profileZoom);
     };
 
     const handleSave = async (e) => {
@@ -399,12 +319,7 @@ const ProfilePage = () => {
             return;
         }
 
-        // Validate username is provided
-        if (!formData.username.trim()) {
-            showError('Username is required.');
-            setIsLoading(false);
-            return;
-        }
+        // Username validation removed
 
         // Validate name has at least two words
         const nameWords = formData.name.trim().split(/\s+/).filter(w => w.length > 0);
@@ -423,7 +338,7 @@ const ProfilePage = () => {
 
         try {
             let finalCoverPhoto = formData.coverPhoto;
-            if (tempCoverPhoto) {
+            if (tempCoverPhoto || formData.coverPhoto) {
                 const cropped = await getCroppedImage();
                 if (cropped) {
                     finalCoverPhoto = cropped;
@@ -431,7 +346,7 @@ const ProfilePage = () => {
             }
 
             let finalProfilePhoto = formData.profilePicture;
-            if (tempProfilePhoto) {
+            if (tempProfilePhoto || formData.profilePicture) {
                 const croppedProfile = await getCroppedProfileImage();
                 if (croppedProfile) {
                     finalProfilePhoto = croppedProfile;
@@ -482,8 +397,8 @@ const ProfilePage = () => {
 
     const handleCancel = () => {
         setFormData({
-            name: user.name || '',
             username: user.username || '',
+            name: user.name || '',
             email: user.email || '',
             designation: user.designation || '',
             department: user.department || '',
@@ -495,11 +410,12 @@ const ProfilePage = () => {
         setIsEditing(false);
         setIsRepositioning(false);
         setTempCoverPhoto(null);
+        setRepositionPos(initialCover.pos);
 
         setIsRepositioningProfile(false);
         setTempProfilePhoto(null);
-        setProfileZoom(1);
-
+        setProfileRepositionPos(initialProfile.pos);
+        setProfileZoom(initialProfile.zoom);
     };
 
     return (
@@ -512,19 +428,19 @@ const ProfilePage = () => {
                     className={`profile-cover-banner ${isRepositioning ? 'repositioning' : ''}`}
                     style={{
                         backgroundImage: (isRepositioning ? tempCoverPhoto : formData.coverPhoto)
-                            ? `url(${isRepositioning ? tempCoverPhoto : formData.coverPhoto})`
+                            ? `url(${extractPhotoData(isRepositioning ? tempCoverPhoto : formData.coverPhoto).url})`
                             : undefined,
-                        backgroundSize: '100%',
+                        backgroundSize: 'cover',
                         backgroundPosition: isRepositioning
                             ? `${repositionPos.x}% ${repositionPos.y}%`
-                            : 'center top',
+                            : isEditing ? `${repositionPos.x}% ${repositionPos.y}%` : `${initialCover.pos.x}% ${initialCover.pos.y}%`,
                         backgroundRepeat: 'no-repeat',
-                        cursor: isRepositioning ? 'move' : 'default'
+                        cursor: isEditing ? 'move' : 'default'
                     }}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
+                    onMouseDown={(e) => isEditing && handleMouseDown(e)}
+                    onMouseMove={(e) => isEditing && handleMouseMove(e)}
+                    onMouseUp={() => isEditing && handleMouseUp()}
+                    onMouseLeave={() => isEditing && handleMouseUp()}
                 >
                     {!isRepositioning && <div className="profile-cover-gradient"></div>}
 
@@ -593,31 +509,30 @@ const ProfilePage = () => {
                 <div className="profile-avatar-section">
                     <div className="profile-avatar-wrapper">
                         <div
-                            className={`profile-large-avatar ${isRepositioningProfile ? 'repositioning' : ''}`}
+                            className={`profile-large-avatar ${(isRepositioningProfile || isEditing) ? 'repositioning' : ''}`}
                             ref={profileImageRef}
-                            onMouseDown={handleProfileMouseDown}
-                            onMouseMove={handleProfileMouseMove}
-                            onMouseUp={handleProfileMouseUp}
-                            onMouseLeave={handleProfileMouseUp}
-                            style={isRepositioningProfile ? { cursor: 'move' } : {}}
+                            onMouseDown={(e) => isEditing && handleProfileMouseDown(e)}
+                            onMouseMove={(e) => isEditing && handleProfileMouseMove(e)}
+                            onMouseUp={() => isEditing && handleProfileMouseUp()}
+                            onMouseLeave={() => isEditing && handleProfileMouseUp()}
+                            style={isEditing ? { cursor: 'move' } : {}}
                         >
-                            {isRepositioningProfile ? (
+                            {(isRepositioningProfile || (isEditing && formData.profilePicture) || formData.profilePicture) ? (
                                 <img
-                                    src={tempProfilePhoto}
-                                    alt="Profile Reposition"
+                                    src={extractPhotoData(isRepositioningProfile ? tempProfilePhoto : formData.profilePicture).url}
+                                    alt="Profile"
                                     style={{
                                         width: '100%',
                                         height: '100%',
                                         objectFit: 'cover',
-                                        objectPosition: `${profileRepositionPos.x}% ${profileRepositionPos.y}%`,
+                                        objectPosition: `${(isRepositioningProfile || isEditing) ? profileRepositionPos.x : initialProfile.pos.x}% ${(isRepositioningProfile || isEditing) ? profileRepositionPos.y : initialProfile.pos.y}%`,
+                                        transform: `scale(${(isRepositioningProfile || isEditing) ? profileZoom : initialProfile.zoom})`,
                                         pointerEvents: 'none',
                                         userSelect: 'none'
                                     }}
                                 />
-                            ) : formData.profilePicture ? (
-                                <img src={formData.profilePicture} alt="Profile" />
                             ) : (
-                                getInitials(formData.name || user.name) || user.username?.charAt(0).toUpperCase() || 'U'
+                                getInitials(formData.name || user.email) || user.email?.charAt(0).toUpperCase() || 'U'
                             )}
 
                             {isEditing && !isRepositioningProfile && (
@@ -682,7 +597,7 @@ const ProfilePage = () => {
 
                 <div className="profile-identity-info">
                     <h1 className="profile-display-name">
-                        {user.name || user.username || 'User'}
+                        {user.name || user.email?.split('@')[0] || 'User'}
                         {((isEditing ? formData.phoneNumber : user.phoneNumber)?.length === 10) && (
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '6px', verticalAlign: 'middle' }}>
                                 <path fillRule="evenodd" clipRule="evenodd" d="M12.2356 1.70113C11.5833 0.816091 10.2751 0.816091 9.62283 1.70113L8.68067 2.98068C8.34997 3.42939 7.7951 3.65992 7.2343 3.5828L5.65582 3.36605C4.55836 3.21495 3.53503 3.96207 3.37682 5.0601L3.14923 6.63842C3.06847 7.19894 2.8028 7.71261 2.3985 8.09353L1.26125 9.16738C0.470477 9.91421 0.470477 11.218 1.26125 11.9648L2.3985 13.0387C2.8028 13.4196 3.06847 13.9333 3.14923 14.4938L3.37682 16.0721C3.53503 17.1701 4.55836 17.9173 5.65582 17.7661L7.2343 17.5494C7.7951 17.4723 8.34997 17.7028 8.68067 18.1515L9.62283 19.4311C10.2751 20.3161 11.5833 20.3161 12.2356 19.4311L13.1778 18.1515C13.5085 17.7028 14.0633 17.4723 14.6241 17.5494L16.2026 17.7661C17.3001 17.9173 18.3234 17.1701 18.4816 16.0721L18.7092 14.4938C18.7899 13.9333 19.0556 13.4196 19.4599 13.0387L20.5972 11.9648C21.3879 11.218 21.3879 9.91421 20.5972 9.16738L19.4599 8.09353C19.0556 7.71261 18.7899 7.19894 18.7092 6.63842L18.4816 5.0601C18.3234 3.96207 17.3001 3.21495 16.2026 3.36605L14.6241 3.5828C14.0633 3.65992 13.5085 3.42939 13.1778 2.98068L12.2356 1.70113Z" fill="#1877F2" />
@@ -690,10 +605,20 @@ const ProfilePage = () => {
                             </svg>
                         )}
                     </h1>
-                    <p className="profile-handle">@{user.username || 'user'}</p>
+                    <div className="profile-handle-row" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginTop: '0.15rem' }}>
+                        {(user.username && !user.username.includes('@')) && (
+                            <span className="profile-username-handle" style={{
+                                fontWeight: 600,
+                                color: 'var(--accentColor)',
+                                fontSize: '1.2rem',
+                                letterSpacing: '0.01em'
+                            }}>{user.username}</span>
+                        )}
+                    </div>
                     {isEditing ? (
                         <div style={{ maxWidth: '600px', width: '100%', position: 'relative' }}>
                             <textarea
+                                ref={bioInputRef}
                                 className="profile-bio-input"
                                 name="bio"
                                 value={formData.bio}
@@ -702,7 +627,7 @@ const ProfilePage = () => {
                                 maxLength={150} // Limit to 150 characters
                                 rows={1}
                                 style={{
-                                    marginTop: '0.2rem',
+                                    marginTop: '1.2rem',
                                     marginBottom: '0',
                                     paddingTop: '0.4rem',
                                     paddingBottom: '1rem', // Further reduced padding for counter
@@ -728,7 +653,12 @@ const ProfilePage = () => {
                             ) : (
                                 <span
                                     className="profile-add-bio"
-                                    onClick={() => setIsEditing(true)}
+                                    onClick={() => {
+                                        setIsEditing(true);
+                                        setTimeout(() => {
+                                            bioInputRef.current?.focus();
+                                        }, 100);
+                                    }}
                                 >
                                     Add Bio
                                 </span>
@@ -760,7 +690,12 @@ const ProfilePage = () => {
                                 )}
                             </>
                         ) : (
-                            <span className="profile-info-placeholder" onClick={() => setIsEditing(true)}>
+                            <span className="profile-info-placeholder" onClick={() => {
+                                setIsEditing(true);
+                                setTimeout(() => {
+                                    designationInputRef.current?.focus();
+                                }, 100);
+                            }}>
                                 + Add Professional Details
                             </span>
                         )}
@@ -792,24 +727,13 @@ const ProfilePage = () => {
                                     placeholder="Your full name"
                                 />
                             </div>
-                            <div className="form-group">
-                                <label>Username <span style={{ color: 'red' }}>*</span></label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    value={formData.username}
-                                    onChange={handleInputChange}
-                                    disabled={!isEditing}
-                                    placeholder="username"
-                                    style={{ textTransform: 'lowercase' }}
-                                />
-                            </div>
                         </div>
 
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Designation</label>
                                 <input
+                                    ref={designationInputRef}
                                     type="text"
                                     name="designation"
                                     value={formData.designation}

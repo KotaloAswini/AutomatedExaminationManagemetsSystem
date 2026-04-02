@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect, useState } from 'react';
+import { memo, useRef, useEffect, useState } from 'react';
 
 const AnalyticsChart = ({ data = [], title = "Semester Distribution" }) => {
     const containerRef = useRef(null);
