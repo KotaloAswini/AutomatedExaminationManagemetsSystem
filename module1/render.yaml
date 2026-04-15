@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: timetable-backend
+    env: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false

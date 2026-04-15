@@ -10,9 +10,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import java.util.Arrays;
 
@@ -26,22 +23,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/exams/**").permitAll()
                         .requestMatchers("/io/**").permitAll()

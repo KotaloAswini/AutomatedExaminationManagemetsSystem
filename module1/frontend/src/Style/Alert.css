@@ -16,7 +16,7 @@
 }
 
 .alert.active {
-    top: 1rem;
+    top: calc(64px + 12px);
     z-index: 2000;
 }
 

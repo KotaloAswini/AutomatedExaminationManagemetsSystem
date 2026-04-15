@@ -145,7 +145,9 @@ function AboutUsPage() {
 
             {/* Footer */}
             <div className='aboutus-footer'>
-                <p>&copy; 2026 Nitte, Bangalore | Powered by <span className='aboutus-footer-name chillipages-brand'>CSE Students</span></p>
+                <div className='aboutus-footer-inner'>
+                    <p>&copy; 2026 Nitte, Bangalore | Powered by <span className='aboutus-footer-name chillipages-brand'>CSE Students</span></p>
+                </div>
             </div>
         </div>
     );

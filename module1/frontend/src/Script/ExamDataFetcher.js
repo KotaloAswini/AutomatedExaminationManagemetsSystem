@@ -1,6 +1,5 @@
 import { url as API_URL } from './fetchUrl';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 
 function getActorEmail() {
     try {

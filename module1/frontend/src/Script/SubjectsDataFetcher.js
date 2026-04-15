@@ -1,12 +1,8 @@
-import { getApiToken, url } from "./fetchUrl"
+import { url } from "./fetchUrl"
 
 export const getSubjectsDetailsList = async (onSuccess = () => { }) => {
     try {
-        const response = await fetch(`${url}/io/subjects`, {
-            headers: {
-                'Api-Token': await getApiToken()
-            }
-        });
+        const response = await fetch(`${url}/io/subjects`);
         if (response.status === 200) {
             let listArray = [];
             try {
@@ -34,12 +30,10 @@ export const saveSubject = async (subjectDetails, onSuccess, onFailed) => {
         const response = await fetch(`${url}/io/subjects/${encodeURIComponent(subjectName)}`, {
             method: "PUT",
             headers: {
-                'content-type': 'application/json',
-                'Api-Token': await getApiToken()
+                'content-type': 'application/json'
             },
             body: JSON.stringify(subjectDetails)
         });
-
 
         if (response.status === 200 || response.status === 201) {
             onSuccess();

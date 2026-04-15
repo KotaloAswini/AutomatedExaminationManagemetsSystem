@@ -12,19 +12,25 @@ const DocsPage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const getScrollRoot = () => document.querySelector('.app');
+
     const scrollToSection = (id) => {
         if (isMobile) {
             setActiveSection(id);
-            window.scrollTo({ top: 0, behavior: 'instant' });
+            const scrollRoot = getScrollRoot();
+            if (scrollRoot) {
+                scrollRoot.scrollTo({ top: 0, behavior: 'auto' });
+            }
         } else {
             const element = document.getElementById(id);
-            if (element && contentRef.current) {
-                const containerTop = contentRef.current.getBoundingClientRect().top;
+            const scrollRoot = getScrollRoot();
+            if (element && scrollRoot) {
+                const rootTop = scrollRoot.getBoundingClientRect().top;
                 const elementTop = element.getBoundingClientRect().top;
-                const offset = elementTop - containerTop + contentRef.current.scrollTop;
+                const offset = elementTop - rootTop + scrollRoot.scrollTop;
 
-                contentRef.current.scrollTo({
-                    top: offset - 20,
+                scrollRoot.scrollTo({
+                    top: Math.max(0, offset - 84),
                     behavior: 'auto'
                 });
                 setActiveSection(id);
@@ -36,20 +42,19 @@ const DocsPage = () => {
         if (isMobile) return; // Scroll spy disabled on mobile (Tabs mode)
 
         const handleScroll = () => {
-            const isMobile = window.innerWidth <= 1024;
+            const mobileViewport = window.innerWidth <= 1024;
             const sections = document.querySelectorAll('.docs-section');
+            const scrollRoot = getScrollRoot();
+            if (!scrollRoot) return;
 
             let scrollPosition;
-            let containerTop = 0;
+            let rootTop = 0;
 
-            if (isMobile) {
-                scrollPosition = window.scrollY;
-                // For window scroll, containerTop is effectively 0 relative to viewport, 
-                // but we need to adjust for the element positions
+            if (mobileViewport) {
+                scrollPosition = scrollRoot.scrollTop;
             } else {
-                if (!contentRef.current) return;
-                scrollPosition = contentRef.current.scrollTop;
-                containerTop = contentRef.current.getBoundingClientRect().top;
+                scrollPosition = scrollRoot.scrollTop;
+                rootTop = scrollRoot.getBoundingClientRect().top;
             }
 
             // Default to introduction if at top
@@ -58,53 +63,48 @@ const DocsPage = () => {
                 return;
             }
 
+            // Check if we hit the bottom of the page
+            const isBottom = Math.ceil(scrollRoot.scrollTop + scrollRoot.clientHeight) >= scrollRoot.scrollHeight;
+            if (isBottom && !mobileViewport) {
+                // If we're at the very bottom, always select the last visible link
+                setActiveSection('built-with');
+                return;
+            }
+
             let current = '';
             sections.forEach(section => {
                 const rect = section.getBoundingClientRect();
 
-                // Logic differs slightly for window vs container
-                if (isMobile) {
-                    // In window scroll, getBoundingClientRect().top is relative to viewport
-                    // We check if the element is near the top of the viewport
+                if (mobileViewport) {
                     if (rect.top <= 250 && rect.bottom >= 250) {
                         current = section.getAttribute('id');
                     }
                 } else {
-                    const sectionTop = rect.top - containerTop + scrollPosition;
-                    if (scrollPosition >= sectionTop - 150) {
+                    const sectionTop = rect.top - rootTop + scrollPosition;
+                    if (scrollPosition >= sectionTop - 160) {
                         current = section.getAttribute('id');
                     }
                 }
             });
 
-            if (current) setActiveSection(current);
+            if (current && current !== 'technology-stack') {
+                setActiveSection(current);
+            }
         };
 
-        const container = contentRef.current;
-        window.addEventListener('scroll', handleScroll);
-        if (container) {
-            container.addEventListener('scroll', handleScroll);
+        const scrollRoot = getScrollRoot();
+        if (scrollRoot) {
+            scrollRoot.addEventListener('scroll', handleScroll);
         }
 
         handleScroll(); // Initial check
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
-            if (container) {
-                container.removeEventListener('scroll', handleScroll);
+            if (scrollRoot) {
+                scrollRoot.removeEventListener('scroll', handleScroll);
             }
         };
     }, [isMobile]);
-
-    // Sync sidebar scroll with active section
-    useEffect(() => {
-        if (window.innerWidth <= 1024) return; // Disable on mobile to prevent scroll jumping
-
-        const activeLink = document.querySelector('.docs-nav button.active');
-        if (activeLink) {
-            activeLink.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-        }
-    }, [activeSection]);
 
     const sidebarLinks = [
         { id: 'introduction', label: 'Overview' },

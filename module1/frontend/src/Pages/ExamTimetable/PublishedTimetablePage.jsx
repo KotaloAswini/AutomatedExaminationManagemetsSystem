@@ -48,6 +48,18 @@ function PublishedTimetablePage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    useEffect(() => {
+        const appRoot = document.querySelector('.app');
+        if (!appRoot) return;
+
+        appRoot.classList.add('published-timetable-no-page-scroll');
+        appRoot.classList.add('exam-timetable-hide-outer-scrollbar');
+        return () => {
+            appRoot.classList.remove('published-timetable-no-page-scroll');
+            appRoot.classList.remove('exam-timetable-hide-outer-scrollbar');
+        };
+    }, []);
+
     // Edit modal state
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingExam, setEditingExam] = useState(null);
@@ -368,7 +380,7 @@ function PublishedTimetablePage() {
                         <option value="Retest MSE II">Retest MSE II</option>
                     </select>
 
-                    <div className="exam-search-container" style={{ marginLeft: 'auto' }}>
+                    <div className="exam-search-container">
                         <span className="exam-search-icon" style={{ display: 'flex', alignItems: 'center' }}>
                             <div style={{ width: '16px', height: '16px' }}>
                                 <SearchIcon fillColor="#64748b" />
@@ -634,6 +646,12 @@ function PublishedTimetablePage() {
                     align-items: center;
                     gap: 0.75rem;
                     flex-wrap: wrap;
+                }
+                .student-view .filter-bar .exam-search-container {
+                    margin-left: auto !important;
+                    flex: 0 0 auto;
+                    width: 280px;
+                    max-width: 280px;
                 }
                 .student-view .filter-bar label {
                     font-weight: 500;
@@ -921,16 +939,33 @@ function PublishedTimetablePage() {
 
                 @media (max-width: 768px) {
                     .student-view .filter-bar {
-                        flex-wrap: nowrap;
-                        overflow-x: auto;
-                        padding-bottom: 5px;
-                        padding-right: 20px; /* Ensure last item isn't cut off */
-                        -webkit-overflow-scrolling: touch;
-                        gap: 10px;
+                        display: grid;
+                        grid-template-columns: max-content repeat(3, minmax(0, 1fr));
+                        justify-content: start;
+                        align-items: center;
+                        overflow-x: hidden;
+                        padding-bottom: 0;
+                        padding-right: 0;
+                        column-gap: 0.35rem;
+                        row-gap: 0.5rem;
                     }
-                    
-                    .student-view .filter-bar > * {
-                        flex-shrink: 0;
+
+                    .student-view .filter-bar label {
+                        margin-right: 0;
+                    }
+
+                    .student-view .filter-bar select {
+                        font-size: 0.75rem;
+                        padding: 0.34rem 0.42rem;
+                        width: 100%;
+                        min-width: 0;
+                    }
+
+                    .student-view .filter-bar .exam-search-container {
+                        margin-left: 0 !important;
+                        grid-column: 1 / -1;
+                        width: 100%;
+                        max-width: 100%;
                     }
                     
                     /* Hide scrollbar for cleaner look */

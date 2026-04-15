@@ -25,13 +25,8 @@ const menuData = [
     },
     {
         name: "Profile",
-        icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5.52 19c.64-2.2 1.84-3 3.22-3h6.52c1.38 0 2.58.8 3.22 3" /><circle cx="12" cy="10" r="3" /><circle cx="12" cy="12" r="10" /></svg>,
+        icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" /></svg>,
         link: "/Profile"
-    },
-    {
-        name: "Settings",
-        icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
-        link: "/Settings"
     },
     {
         name: "Docs",
@@ -48,12 +43,13 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
     const { showConfirm } = useConfirm();
 
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showFooterLogout, setShowFooterLogout] = useState(false);
     const accountBlockRef = useRef(null);
     const accountName = user?.name || user?.email?.split('@')[0] || 'User';
     const accountHandle = user?.email || accountName;
     const accountAvatarUrl = user?.profilePicture ? user.profilePicture.split('#meta=')[0].split('|meta=')[0] : '';
+    const isInstitutionalAccount = canScheduleTimetable(user?.email);
     const accountInitials = accountName
         .split(' ')
         .filter(Boolean)
@@ -75,6 +71,17 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
         };
     }, [showFooterLogout]);
 
+    useEffect(() => {
+        if (window.innerWidth > 800) return;
+
+        const app = document.querySelector('.app');
+        if (app && !app.classList.contains('active')) {
+            app.classList.add('active');
+            setSidebarOpen(false);
+            setShowFooterLogout(false);
+        }
+    }, [route.pathname]);
+
     function toggleMenubar() {
         let activeApp = document.querySelector(".app.active");
         let app = document.querySelector(".app")
@@ -88,7 +95,7 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
     const handleLinkClick = () => {
         if (window.innerWidth <= 800) {
             let app = document.querySelector(".app")
-            if (app && !app.classList.contains("active")) {
+            if (app) {
                 app.classList.add("active")
             }
             setSidebarOpen(false);
@@ -113,29 +120,48 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
         );
     };
 
+    const handleSettingsClick = () => {
+        setShowFooterLogout(false);
+        handleLinkClick();
+    };
+
+    const handleLogoClick = (e) => {
+        if (route.pathname === '/') {
+            e.preventDefault();
+            window.location.reload();
+            return;
+        }
+        handleLinkClick();
+    };
+
+    const handleProfileClick = () => {
+        setShowFooterLogout(false);
+        handleLinkClick();
+    };
+
     return (
         <nav className='menubar-container'>
-            <div className='menu-header' style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '1rem' }}>
-                <div className='title' style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>
-                    <Link to="/">
-                        <img src={logo} alt="AEMS" className="logo-img" style={{ margin: '1.5rem auto 0.5rem', cursor: 'pointer' }} />
+            <div className='menu-header'>
+                <div className='title'>
+                    <Link to="/" onClick={handleLogoClick}>
+                        <img src={logo} alt="AEMS" className="logo-img" />
                     </Link>
                 </div>
-                <div className='toggle-menu' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '0', width: '100%', marginTop: '2.4rem' }}>
-                    <span className="toggle-icon-wrapper" onClick={toggleMenubar} data-tooltip={sidebarOpen ? 'Close sidebar' : 'Open sidebar'} style={{ position: 'relative', display: 'inline-flex', cursor: 'pointer' }}>
-                        <svg className='icon' xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                <div className='toggle-menu'>
+                    <span className="toggle-icon-wrapper" onClick={toggleMenubar} data-tooltip={sidebarOpen ? 'Close menu' : 'Open menu'}>
+                        <svg className='icon' xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </span>
                 </div>
             </div>
 
-            <div className='menu-list' style={{ width: '100%' }}>
+            <div className='menu-list'>
 
                 {menuData.filter(menu => {
                     const isCoordinator = canScheduleTimetable(user?.email);
                     if (menu.name === "Exam Timetable" && !isCoordinator) return false;
                     return true;
                 }).map((menu, index) => {
-                    const isActive = route.pathname === menu.link || (menu.link === '/Settings' && route.pathname === '/AboutUs')
+                    const isActive = route.pathname === menu.link
 
                     return (
                         <Link to={menu.link} onClick={handleLinkClick} className={`menu-container ${isActive ? "active" : ""}`} key={index} data-tooltip={menu.name}>
@@ -151,11 +177,52 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
                     <div className="footer-account-block" ref={accountBlockRef}>
                         {showFooterLogout && (
                             <div className="account-popover" role="menu" aria-label="Account menu">
+                                <div className="account-popover-header">
+                                    <div className="account-avatar account-popover-avatar" aria-hidden="true">
+                                        {accountAvatarUrl ? <img src={accountAvatarUrl} alt="" /> : accountInitials}
+                                    </div>
+                                    <div className="account-popover-identity">
+                                        <div className="account-popover-name">{accountName}</div>
+                                        <div className="account-popover-email">{accountHandle}</div>
+                                    </div>
+                                </div>
+                                <div className="account-popover-divider" aria-hidden="true"></div>
+
+                                <Link to="/AboutUs" className="account-popover-item" role="menuitem" onClick={handleProfileClick}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <span>About</span>
+                                </Link>
+
+                                <div className="account-popover-divider" aria-hidden="true"></div>
+
+                                <Link to="/Settings" className="account-popover-item" role="menuitem" onClick={handleSettingsClick}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                    <span>Settings</span>
+                                </Link>
+
+                                {isInstitutionalAccount && (
+                                    <>
+                                        <div className="account-popover-divider" aria-hidden="true"></div>
+                                        <a
+                                            href="https://mail.google.com/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="account-popover-item"
+                                            role="menuitem"
+                                            onClick={() => setShowFooterLogout(false)}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>
+                                            <span>Gmail</span>
+                                        </a>
+                                    </>
+                                )}
+
+                                <div className="account-popover-divider" aria-hidden="true"></div>
+
                                 <button type="button" className="account-popover-item logout-action" onClick={handleLogout}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                                    <span>Log out</span>
+                                    <span>Sign out</span>
                                 </button>
-                                <span className="account-popover-arrow" aria-hidden="true"></span>
                             </div>
                         )}
 
@@ -185,7 +252,7 @@ const Menubar = ({ onMenuToggleClick = () => { } }) => {
                     <button
                         className="compact-profile"
                         type="button"
-                        aria-label="Profile"
+                        aria-label="Account"
                         data-tooltip={accountName}
                         aria-expanded={showFooterLogout}
                         onClick={() => setShowFooterLogout(prev => !prev)}

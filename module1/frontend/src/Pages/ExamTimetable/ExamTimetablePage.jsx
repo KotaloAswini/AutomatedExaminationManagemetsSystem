@@ -78,6 +78,16 @@ function ExamTimetablePage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    useEffect(() => {
+        const appRoot = document.querySelector('.app');
+        if (!appRoot) return;
+
+        appRoot.classList.add('exam-timetable-hide-outer-scrollbar');
+        return () => {
+            appRoot.classList.remove('exam-timetable-hide-outer-scrollbar');
+        };
+    }, []);
+
     // Filter state
     const [filterSemester, setFilterSemester] = useState();
     const [filterDepartment, setFilterDepartment] = useState('');
@@ -387,7 +397,7 @@ function ExamTimetablePage() {
     return (
         <div className='page exam-timetable'>
             <div className='page-header'>
-                <h1 className='page-title'>
+                <h1 className='page-title exam-main-title'>
                     <span className='title-icon' style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '8px' }}>
                         <ExamTimetableIcon size={32} color="#2563eb" />
                     </span>

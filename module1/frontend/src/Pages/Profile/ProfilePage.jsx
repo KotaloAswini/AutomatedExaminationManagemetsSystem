@@ -97,6 +97,30 @@ const ProfilePage = () => {
         return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
     };
 
+    const renderBioWithLinks = (text) => {
+        if (!text) return null;
+
+        const parts = String(text).split(/(https?:\/\/[^\s]+|www\.[^\s]+)/gi);
+        return parts.map((part, index) => {
+            const isUrl = /^(https?:\/\/|www\.)/i.test(part);
+            if (!isUrl) {
+                return <span key={`bio-text-${index}`}>{part}</span>;
+            }
+
+            const href = /^https?:\/\//i.test(part) ? part : `https://${part}`;
+            return (
+                <a
+                    key={`bio-link-${index}`}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    {part}
+                </a>
+            );
+        });
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === 'username') {
@@ -419,7 +443,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="page profile-page">
+        <div className={`page profile-page ${isEditing ? 'profile-editing-layout' : ''}`}>
 
 
             <div className="profile-twitter-container">
@@ -616,7 +640,7 @@ const ProfilePage = () => {
                         )}
                     </div>
                     {isEditing ? (
-                        <div style={{ maxWidth: '600px', width: '100%', position: 'relative' }}>
+                        <div className="profile-bio-editor">
                             <textarea
                                 ref={bioInputRef}
                                 className="profile-bio-input"
@@ -649,7 +673,7 @@ const ProfilePage = () => {
                     ) : (
                         <div className="profile-bio-display">
                             {formData.bio ? (
-                                <p className="profile-bio-text">{formData.bio}</p>
+                                <p className="profile-bio-text">{renderBioWithLinks(formData.bio)}</p>
                             ) : (
                                 <span
                                     className="profile-add-bio"

@@ -17,15 +17,8 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         try {
-            // Seed a test user for Module 1 ONLY
-            if (userRepository.count() == 0) {
-                com.example.timetable.model.User user = new com.example.timetable.model.User();
-                user.setUsername("admin");
-                user.setEmail("test@test.com");
-                user.setPassword("admin123");
-                userRepository.save(user);
-                logger.info("✓ Module 1: Default test user created (admin / test@test.com)");
-            }
+            long userCount = userRepository.count();
+            logger.info("✓ Database connected. Registered users: {}", userCount);
         } catch (Exception e) {
             logger.error("⚠ MongoDB not connected. App will work without database persistence.");
             logger.error("  Start MongoDB and restart the app to enable data saving.");

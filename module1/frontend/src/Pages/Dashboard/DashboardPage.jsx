@@ -27,11 +27,6 @@ function DashboardPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        loadData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const loadData = async () => {
         setLoading(true);
         try {
@@ -72,14 +67,14 @@ function DashboardPage() {
                     <div className='welcome-content-wrapper'>
                         {isCoordinator ? (
                             <div className='welcome-header'>
-                                <h1>Timetable Generator</h1>
-                                <p>Manage curriculum &amp; exams.</p>
+                                <h1 className='welcome-generator-title'>Timetable Generator</h1>
+                                <p className='welcome-generator-subtitle'>Manage curriculum &amp; exams.</p>
                                 <Link to="/ExamTimetable" className='btn-light btn-sm'>+ New Schedule</Link>
                             </div>
                         ) : (
                             <div className='welcome-header'>
-                                <h1>Examination Timetable</h1>
-                                <p>View &amp; download published exam schedules.</p>
+                                <h1 className='welcome-exam-title'>Examination Timetable</h1>
+                                <p className='welcome-exam-subtitle'>View &amp; download published exam schedules.</p>
                                 <Link to="/ViewTimetable" className='btn-light btn-sm'>View Timetable</Link>
                             </div>
                         )}
@@ -89,7 +84,7 @@ function DashboardPage() {
                 <div className='pipeline-card'>
                     <div className='pipeline-header'>
                         <span className='pipeline-tag'>{isCoordinator ? 'Workflow' : 'Status'}</span>
-                        <span className={`pipeline-status-text ${isCoordinator && examStatus.published > 0 ? 'pipeline-status-complete' : ''}`}>
+                        <span className={`pipeline-status-text ${examStatus.published > 0 ? 'pipeline-status-complete' : ''}`}>
                             {isCoordinator
                                 ? (examStatus.published > 0 ? 'All stages complete' : examStatus.total > 0 ? 'In progress' : subjectCount > 0 ? 'Getting started' : 'Not started')
                                 : (examStatus.published > 0 ? `${examStatus.published} timetable(s) published` : 'No timetables published yet')
@@ -190,11 +185,6 @@ function DashboardPage() {
                             <div className='insights-content' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px', gap: '1rem' }}>
                                 <div className='insights-no-data' style={{ textAlign: 'center' }}>
                                     <p style={{ color: 'var(--textColor2)', fontSize: '0.85rem' }}>No exam data found to display charts.</p>
-                                    {canScheduleTimetable(user?.email) && (
-                                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                                            <Link to="/ExamTimetable" className='btn-secondary btn-sm'>Schedule Exam</Link>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         ) : (

@@ -211,43 +211,6 @@ public class ExamController {
         return examService.getDepartments();
     }
 
-    // Endpoint to update all old time slots to new ones
-    @PostMapping("/update-all-times")
-    public ResponseEntity<?> updateAllTimes(@RequestParam(required = false) String actorEmail) {
-        if (!isAllowedScheduler(actorEmail)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Only approved scheduler accounts can modify timetable."));
-        }
-
-        List<Exam> exams = examService.getExams(null, null, null);
-        int updatedCount = 0;
-
-        for (Exam exam : exams) {
-            boolean changed = false;
-
-            // Morning Slot: 9:00 - 12:00 => 9:30 - 11:00
-            if (exam.getStartTime().toString().equals("09:00")) {
-                exam.setStartTime(LocalTime.parse("09:30"));
-                exam.setEndTime(LocalTime.parse("11:00"));
-                exam.setDurationMinutes(90);
-                changed = true;
-            }
-            // Afternoon Slot: 13:00 - 16:00 => 13:30 - 15:00
-            else if (exam.getStartTime().toString().equals("13:00") || exam.getStartTime().toString().equals("01:00")) {
-                exam.setStartTime(LocalTime.parse("13:30"));
-                exam.setEndTime(LocalTime.parse("15:00"));
-                exam.setDurationMinutes(90);
-                changed = true;
-            }
-
-            if (changed) {
-                examService.updateExam(exam.getId(), exam);
-                updatedCount++;
-            }
-        }
-
-        return ResponseEntity.ok(Map.of("message", "Updated " + updatedCount + " exams to new timings"));
-    }
-
     // DTO for requests
     public static class ExamRequest {
         public Integer semester;

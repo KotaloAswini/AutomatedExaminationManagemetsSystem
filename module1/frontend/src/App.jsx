@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 
 // Components (Pages)
@@ -96,30 +96,14 @@ function MainApp() {
 	const location = useLocation();
 	const { user, loading } = useAuth();
 	const { addNotification, removeNotificationByMessage } = useNotifications();
-	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-	const isPublicPage = location.pathname === '/login' || location.pathname === '/forgot-password';
+	const isPublicPage = location.pathname === '/login' || location.pathname === '/forgot-password' || location.pathname === '/register';
+	const isSettingsPage = location.pathname === '/Settings';
+	const isDocsPage = location.pathname === '/Docs';
+	const isProfilePage = location.pathname === '/Profile';
+	const isDashboardPage = location.pathname === '/';
 	const shouldShowLayout = user && !isPublicPage;
 
-
-	const restorePageFocus = useCallback(() => {
-		// Delay focus until after React re-renders and overlay is removed
-		setTimeout(() => {
-			if (document.activeElement) {
-				document.activeElement.blur();
-			}
-
-			const mainContainer = document.querySelector('.main-container');
-			const isMobile = window.innerWidth <= 800;
-
-			if (isMobile) {
-				// Focus body for native scrolling on mobile
-				document.body.focus();
-			} else if (mainContainer) {
-				mainContainer.focus({ preventScroll: true });
-			}
-		}, 300);
-	}, []);
 
 	useEffect(() => {
 		function autoToggleInResize() {
@@ -129,10 +113,6 @@ function MainApp() {
 			} else {
 				if (app.current)
 					app.current.classList.remove("active");
-			}
-			// Close mobile sidebar when resizing to desktop
-			if (window.innerWidth > 800) {
-				setMobileSidebarOpen(false);
 			}
 		}
 
@@ -185,13 +165,13 @@ function MainApp() {
 			removeNotificationByMessage(message);
 			addNotification(message, 'warning', 6000);
 			sessionStorage.setItem(countKey, '1');
-			sessionStorage.setItem(nextAtKey, String(Date.now() + 60000));
+			sessionStorage.setItem(nextAtKey, String(Date.now() + 15000));
 			return;
 		}
 
 		if (safeCount === 1) {
 			const storedNextAt = Number.parseInt(sessionStorage.getItem(nextAtKey) || '0', 10);
-			const nextAt = Number.isNaN(storedNextAt) || storedNextAt <= 0 ? Date.now() + 60000 : storedNextAt;
+			const nextAt = Number.isNaN(storedNextAt) || storedNextAt <= 0 ? Date.now() + 15000 : storedNextAt;
 			const remaining = Math.max(0, nextAt - Date.now());
 
 			const timerId = setTimeout(() => {
@@ -211,65 +191,60 @@ function MainApp() {
 		}
 	}, [user, location.pathname, addNotification, removeNotificationByMessage]);
 
-
-
-	function openMobileSidebar() {
-		setMobileSidebarOpen(true);
-		if (app.current) {
-			app.current.classList.remove("active");
+	useEffect(() => {
+		if (shouldShowLayout && isDocsPage) {
+			document.body.classList.add('docs-window-lock');
+			return () => {
+				document.body.classList.remove('docs-window-lock');
+			};
 		}
-		// Add CSS class to lock body scroll (works on all mobile browsers)
-		document.body.classList.add('sidebar-open');
-	}
 
-	function closeMobileSidebar() {
-		setMobileSidebarOpen(false);
-		if (app.current) {
-			app.current.classList.add("active");
+		document.body.classList.remove('docs-window-lock');
+	}, [isDocsPage, shouldShowLayout]);
+
+	useEffect(() => {
+		if (shouldShowLayout && isProfilePage) {
+			document.body.classList.add('profile-window-lock');
+			return () => {
+				document.body.classList.remove('profile-window-lock');
+			};
 		}
-		// Remove scroll lock
-		document.body.classList.remove('sidebar-open');
-		restorePageFocus();
-	}
 
+		document.body.classList.remove('profile-window-lock');
+	}, [isProfilePage, shouldShowLayout]);
 
+	useEffect(() => {
+		if (!shouldShowLayout) return;
 
-	function handleMenuToggle() {
-		// If on mobile and sidebar is open, sync state to close it properly (remove overlay)
-		if (mobileSidebarOpen) {
-			setMobileSidebarOpen(false);
-			document.body.classList.remove('sidebar-open'); // Ensure scroll lock is removed
-			restorePageFocus();
-		}
-	}
+		const resetScrollPositions = () => {
+			window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+			document.documentElement.scrollTop = 0;
+			document.body.scrollTop = 0;
+
+			const appContainer = document.querySelector('.app');
+			if (appContainer) {
+				appContainer.scrollTop = 0;
+			}
+
+			const mainContainer = document.querySelector('.main-container');
+			if (mainContainer) {
+				mainContainer.scrollTop = 0;
+			}
+		};
+
+		// Run immediately and once more after paint to avoid stale preserved offsets.
+		resetScrollPositions();
+		const rafId = window.requestAnimationFrame(resetScrollPositions);
+		return () => window.cancelAnimationFrame(rafId);
+	}, [location.pathname, shouldShowLayout]);
 
 	if (loading) return null;
 
 	return (
-		<div className={`app light ${!shouldShowLayout ? 'login-layout' : ''}`} ref={app} style={!shouldShowLayout ? { display: 'block' } : {}}>
+		<div className={`app ${!shouldShowLayout ? 'login-layout' : ''} ${isSettingsPage ? 'settings-no-scrollbar' : ''} ${isProfilePage ? 'profile-no-scrollbar' : ''} ${isDashboardPage ? 'dashboard-no-scrollbar' : ''}`} ref={app} style={!shouldShowLayout ? { display: 'block' } : {}}>
 			<Alert />
 			<Confirm />
-			{shouldShowLayout && <Menubar onMenuToggleClick={handleMenuToggle} />}
-
-			{/* Mobile sidebar overlay */}
-			{shouldShowLayout && mobileSidebarOpen && (
-				<div className="mobile-sidebar-overlay" onClick={closeMobileSidebar} />
-			)}
-
-			{/* Hamburger button for mobile */}
-			{shouldShowLayout && (
-				<button
-					className="hamburger-btn"
-					onClick={openMobileSidebar}
-					aria-label="Open sidebar"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-						<line x1="3" y1="6" x2="21" y2="6"></line>
-						<line x1="3" y1="12" x2="21" y2="12"></line>
-						<line x1="3" y1="18" x2="21" y2="18"></line>
-					</svg>
-				</button>
-			)}
+			{shouldShowLayout && <Menubar />}
 
 			<div className={shouldShowLayout ? 'main-container' : ''} tabIndex="-1" style={shouldShowLayout ? { outline: 'none' } : {}}>
 				<Routes>

@@ -34,16 +34,6 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem('user');
     };
 
-    const resetPassword = () => {
-        // Mock reset password logic
-        return true;
-    };
-
-    const updatePassword = () => {
-        // Mock password update logic
-        return true;
-    };
-
     const updateUser = (updatedData) => {
         const newUser = { ...user, ...updatedData };
         setUser(newUser);
@@ -51,7 +41,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, resetPassword, updatePassword, updateUser, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );

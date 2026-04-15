@@ -41,3 +41,8 @@ yarn-error.log*
 mvnw
 mvnw.cmd
 .mvn/wrapper/maven-wrapper.properties
+
+# SECURITY: Never hardcode credentials in application.properties
+# All secrets (MAIL_PASSWORD, MONGO_URI, etc.) must only be set
+# as Environment Variables in Render dashboard — never in source code.
+# Reference them in application.properties as: ${ENV_VAR_NAME} with NO fallback value.

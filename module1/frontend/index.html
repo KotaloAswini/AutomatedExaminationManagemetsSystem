@@ -27,8 +27,17 @@
 </head>
 
 <body>
+    <!-- Synchronous theme init: prevents flash of white before React loads -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('theme') || 'Dark';
+            var accent = localStorage.getItem('accentColor') || '#2563eb';
+            document.body.classList.add(theme === 'Light' ? 'light' : 'dark');
+            document.documentElement.style.setProperty('--userAccentColor', accent);
+        })();
+    </script>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script> 
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>

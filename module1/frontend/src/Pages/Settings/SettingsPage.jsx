@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import { memo, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import '../../Style/UnifiedPages.css';
 import '../../Style/Pages/Settings.css';
 
@@ -160,27 +159,6 @@ function SettingsPage() {
                             ))}
                         </div>
                     </div>
-
-                    <div className='settings-divider'></div>
-
-                    <Link to="/AboutUs" className='settings-section about-section-link'>
-                        <div className='card-header'>
-                            <div className='card-header-icon aboutus-link-icon'>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <path d="M12 16v-4" />
-                                    <path d="M12 8h.01" />
-                                </svg>
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <h2>About</h2>
-                                <p className='card-desc'>Development Team & Contributors</p>
-                            </div>
-                            <svg className='aboutus-arrow' width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="9 18 15 12 9 6" />
-                            </svg>
-                        </div>
-                    </Link>
                 </div>
 
 

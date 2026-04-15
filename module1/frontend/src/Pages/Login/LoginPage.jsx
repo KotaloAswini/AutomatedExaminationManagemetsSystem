@@ -5,7 +5,6 @@ import { url } from '../../Script/fetchUrl';
 import './Login.css';
 
 // Icons
-// Icons
 import EyeIcon from '../../Icons/Eye';
 import UserIcon from '../../Icons/User';
 import LockIcon from '../../Icons/Lock';
@@ -17,7 +16,7 @@ function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { login } = useAuth(); // kept for logic, though template doesn't show it explicitly, logic remains
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();

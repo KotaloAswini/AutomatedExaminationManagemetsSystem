@@ -28,12 +28,8 @@ export const NotificationProvider = ({ children }) => {
         setNotifications((prev) => prev.filter((n) => n.message !== message));
     }, []);
 
-    const clearAll = useCallback(() => {
-        setNotifications([]);
-    }, []);
-
     return (
-        <NotificationContext.Provider value={{ notifications, addNotification, removeNotification, removeNotificationByMessage, clearAll }}>
+        <NotificationContext.Provider value={{ notifications, addNotification, removeNotification, removeNotificationByMessage }}>
             {children}
             {/* Notification Toast Overlay */}
             <div className="notification-overlay">

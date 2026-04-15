@@ -12,6 +12,12 @@
     overflow-y: auto;
     height: 100%;
     min-height: 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.settings-page::-webkit-scrollbar {
+    display: none;
 }
 
 /* Settings Container - Restores the centered layout */
@@ -539,10 +545,9 @@ body.dark .system-setting-desc {
 
     .accent-picker {
         justify-content: flex-start;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        gap: 0.75rem;
+        flex-wrap: wrap;
+        overflow-x: hidden;
+        gap: 0.65rem;
     }
 
     .accent-btn {

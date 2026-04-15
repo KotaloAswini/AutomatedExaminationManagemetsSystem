@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { url } from '../../Script/fetchUrl';
 import EyeIcon from '../../Icons/Eye';
 import './Login.css';
@@ -15,17 +15,14 @@ function ForgotPasswordPage() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get('token');
-
     const navigate = useNavigate();
 
+    // Pre-warm the Render backend as soon as the page loads
+    // so the user doesn't hit a cold-start delay when they click "Send Reset Link"
     useEffect(() => {
-        // If there's a token in the URL, go straight to step 3 (Set New Password)
-        if (token) {
-            setStep(3);
-        }
-    }, [token]);
+        fetch(`${url}/health`).catch(() => {});
+    }, []);
+
 
     const handleEmailSubmit = async (e) => {
         e.preventDefault();

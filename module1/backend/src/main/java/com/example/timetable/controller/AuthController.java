@@ -73,22 +73,30 @@ public class AuthController {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
 
-        if (userOpt.isPresent()) {
-
-            User user = userOpt.get();
-            // Generate 6-digit OTP
-            String otp = String.format("%06d", new java.util.Random().nextInt(999999));
-            user.setResetToken(otp);
-            user.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
-            userRepository.save(user);
-
-            emailService.sendPasswordResetEmail(email, otp);
-        } else {
-
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(400)
+                    .body(Map.of("error", "No account found with this email address."));
         }
 
-        // Always return success to prevent email enumeration
-        return ResponseEntity.ok(Map.of("message", "If an account exists, a reset link has been sent."));
+        User user = userOpt.get();
+        // Generate 6-digit OTP
+        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+        user.setResetToken(otp);
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        try {
+            emailService.sendPasswordResetEmail(email, otp);
+        } catch (RuntimeException e) {
+            // Roll back the OTP so the user can try again
+            user.setResetToken(null);
+            user.setTokenExpiry(null);
+            userRepository.save(user);
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", e.getMessage()));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "OTP sent successfully."));
     }
 
     @PostMapping("/reset-password")

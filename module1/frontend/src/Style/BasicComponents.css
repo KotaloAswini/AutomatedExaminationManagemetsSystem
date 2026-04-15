@@ -179,7 +179,7 @@ body.dark .btn-type2:hover {
 /* Notification System */
 .notification-overlay {
     position: fixed;
-    top: 20px;
+    top: calc(64px + 12px);
     right: 20px;
     z-index: 950;
     display: flex;
