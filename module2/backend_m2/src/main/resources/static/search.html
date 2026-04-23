@@ -160,7 +160,7 @@
 
 
         <div class="input-group">
-            <input type="text" id="usn" placeholder="Enter USN (e.g. 1NT22CS025)">
+            <input type="text" id="usn" placeholder="Enter USN (e.g. 1NT22CS001)">
             <button onclick="findSeat()">Find Seat</button>
         </div>
     </div>
@@ -170,7 +170,7 @@
 </div>
 
 <div class="footer">
-    © 2025-2026 Nitte Meenakshi Institute of Technology (NMIT)<br>
+    © 2025-2026 Nitte Meenakshi Institute of Technology (NITTE)<br>
     Department of Computer Science & Engineering
 </div>
 
@@ -181,7 +181,7 @@ function findSeat() {
     let usn = document.getElementById("usn").value.trim();
 
     if (usn === "") {
-        document.getElementById("result").innerText = "Please enter USN";
+        document.getElementById("result").innerText = "Please enter  Valid USN";
         return;
     }
 

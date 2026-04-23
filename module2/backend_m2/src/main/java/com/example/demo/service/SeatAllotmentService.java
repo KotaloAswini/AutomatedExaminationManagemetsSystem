@@ -27,16 +27,17 @@ public class SeatAllotmentService {
             else if (s.usn.contains("1NT25")) s25.add(s);
         }
 
-        // shuffle within each batch
+       // Shuffle each group for randomness
+
         Collections.shuffle(s23);
         Collections.shuffle(s24);
         Collections.shuffle(s25);
 
         List<Student> mixed = new ArrayList<>();
-
+         // Find max size among all groups
         int max = Math.max(s23.size(), Math.max(s24.size(), s25.size()));
 
-        // interleave properly
+          // Mix students alternately (23 → 24 → 25)
         for (int i = 0; i < max; i++) {
             if (i < s23.size()) mixed.add(s23.get(i));
             if (i < s24.size()) mixed.add(s24.get(i));
@@ -75,14 +76,9 @@ public class SeatAllotmentService {
                     if (index >= mixed.size()) return;
 
                     Student s = mixed.get(index++);
-
-                    seatingRepository.insertSeat(
-                            s.usn,
-                            room,
-                            r,
-                            c,
-                            exam
-                    );
+                    
+            
+                    seatingRepository.insertSeat( s.usn, room, r, c, exam);
                 }
             }
         }
