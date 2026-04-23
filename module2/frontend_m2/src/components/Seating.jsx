@@ -5,17 +5,59 @@ function Seating({ setPage, searchedUSN }) {
 
   const [rooms, setRooms] = useState(null);
 
-  // ✅ Fetch seating
-  useEffect(() => {
-    fetch("http://localhost:8080/seating")
-      .then(res => res.json())
-      .then(data => setRooms(data))
-      .catch((err) => console.log(err));
-  }, []);
+  const roomsList = [
+    "Class 1","Class 2","Class 3","Class 4",
+    "Class 5","Class 6","Class 7","Class 8",
+    "Class 9","Class 10","Class 11","Class 12",
+    "Lab 1","Lab 2","Lab 3","Lab 4",
+    "Lab 5","Lab 6","Lab 7","Lab 8"
+  ];
 
-  // ✅ AUTO SCROLL TO STUDENT ROOM
-  useEffect(() => {
+  const selectedExam = "MSE1";
 
+  useEffect(() => {
+    const fetchData = async () => {
+      let allRooms = {};
+
+      for (let room of roomsList) {
+        try {
+          let res = await fetch(
+            `http://localhost:8080/seats/layout?room=${room}&exam=${selectedExam}`
+          );
+
+          let data = await res.json();
+
+          // Sort properly
+          data.sort((a, b) => {
+            if (a.row === b.row) return a.col - b.col;
+            return a.row - b.row;
+          });
+
+          // Convert to bench pairs
+          let students = [];
+          for (let i = 0; i < data.length; i += 2) {
+            students.push([
+              data[i]?.usn || "",
+              data[i + 1]?.usn || ""
+            ]);
+          }
+
+          allRooms[room] = students;
+
+        } catch (err) {
+          console.log("Error loading room:", room);
+          allRooms[room] = [];
+        }
+      }
+
+      setRooms(allRooms);
+    };
+
+    fetchData();
+  }, [selectedExam]);
+
+  // Auto scroll to searched student
+  useEffect(() => {
     if (!rooms || !searchedUSN) return;
 
     setTimeout(() => {
@@ -30,7 +72,6 @@ function Seating({ setPage, searchedUSN }) {
 
   }, [rooms, searchedUSN]);
 
-
   if (!rooms) {
     return <h2 style={{ textAlign: "center" }}>Loading seating layout...</h2>;
   }
@@ -38,23 +79,56 @@ function Seating({ setPage, searchedUSN }) {
   return (
     <div className="page">
 
+      {/* Buttons */}
       <div style={{ textAlign: "center", margin: "20px" }}>
-        <button className="back-btn" onClick={() => setPage("search")}>
+
+        <button
+          onClick={() => setPage("search")}
+          style={{
+            marginRight: "20px",
+            padding: "10px",
+            background: "#313997",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer"
+          }}
+        >
           ⬅ Back to Search
         </button>
+
+        <button
+          onClick={() => window.print()}
+          style={{
+            padding: "10px",
+            background: "#313997",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer"
+          }}
+        >
+          🖨️ Print Seating
+        </button>
+
       </div>
 
+      {/* Rooms */}
       {Object.entries(rooms).map(([roomName, students], roomIndex) => {
 
-        let studentIndex = 0;
+        // Check if searched student is inside this room
+        const containsStudent = students.some(
+          pair => pair.includes(searchedUSN)
+        );
 
         return (
           <div
             className="room"
             key={roomIndex}
-            id={students.includes(searchedUSN) ? "targetRoom" : ""}
+            id={containsStudent ? "targetRoom" : ""}
           >
 
+            {/* Header */}
             <div className="header">
               <img
                 src="/images/nmit.logo.jpeg"
@@ -65,10 +139,11 @@ function Seating({ setPage, searchedUSN }) {
               <div className="title">
                 <div><b>NITTE MEENAKSHI INSTITUTE OF TECHNOLOGY (NMIT)</b></div>
                 <div>DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING</div>
-                <div>SEATING ALLOTMENT MSE1</div>
+                <div>SEATING ALLOTMENT {selectedExam}</div>
               </div>
             </div>
 
+            {/* Details */}
             <table className="details">
               <tbody>
                 <tr>
@@ -77,7 +152,7 @@ function Seating({ setPage, searchedUSN }) {
                   <td>Room No: {roomName}</td>
                 </tr>
                 <tr>
-                  <td>Subject: ________</td>
+                  <td>Subject: {selectedExam}</td>
                   <td>Semester: Mixed</td>
                   <td>Academic Year: 2025-2026</td>
                 </tr>
@@ -86,31 +161,27 @@ function Seating({ setPage, searchedUSN }) {
 
             <div className="board">BOARD</div>
 
+            {/* Layout */}
             <div className="layout">
               <div className="door">DOOR</div>
 
               <div className="benches">
 
-                {[...Array(Math.ceil(students.length / 2))].map((_, benchIndex) => {
+                {students.map((pair, index) => (
+                  <div className="bench" key={index}>
+                    <span className={pair[0] === searchedUSN ? "highlight" : ""}>
+                      {pair[0]}
+                    </span>
 
-                  const s1 = students[studentIndex++] || "";
-                  const s2 = students[studentIndex++] || "";
-
-                  return (
-                    <div className="bench" key={benchIndex}>
-                      <span className={s1 === searchedUSN ? "highlight" : ""}>
-                        {s1}
-                      </span>
-
-                      <span className={s2 === searchedUSN ? "highlight" : ""}>
-                        {s2}
-                      </span>
-                    </div>
-                  );
-                })}
+                    <span className={pair[1] === searchedUSN ? "highlight" : ""}>
+                      {pair[1]}
+                    </span>
+                  </div>
+                ))}
 
               </div>
             </div>
+
           </div>
         );
       })}

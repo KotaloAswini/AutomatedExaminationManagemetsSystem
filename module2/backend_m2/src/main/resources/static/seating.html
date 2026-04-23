@@ -1,166 +1,302 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NMIT MSE-1 Seating Allotment</title>
+<title>NMIT MSE-1 Seating Allotment</title>
 
-    <style>
-        body {
-            font-family: "Times New Roman", serif;
-            font-size: 14px;
-        }
+<style>
+body {
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+}
 
-        .room {
-            border: 2px solid black;
-            padding: 10px;
-            width: 900px;
-            margin: 30px auto;
-            page-break-after: always;
-        }
+/* ROOM */
+.room {
+    border: 2px solid black;
+    padding: 15px;
+    width: 900px;
+    margin: 50px auto;
+    position: relative;
+}
 
-        .center {
-            text-align: center;
-            font-weight: bold;
-        }
+/* WATERMARK */
+.room::before {
+    content: "";
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    background-image: url("/images/nmit.logo.jpeg");
+    background-repeat: no-repeat;
+    background-size: 500px;
 
-        /* HEADER + LOGO */
-        .header {
-            position: relative;
-        }
+    width: 500px;
+    height: 500px;
 
-        .logo {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 85px;
-        }
+    opacity: 0.10;
+    z-index: 0;
+}
 
-        .details-table {
-            width: 100%;
-            margin-top: 10px;
-        }
+.room * {
+    position: relative;
+    z-index: 1;
+}
 
-        .details-table td {
-            padding: 4px;
-            font-weight: bold;
-        }
+/* HEADER */
+.header {
+    text-align: center;
+    position: relative;
+}
 
-        .board {
-            border: 1px solid black;
-            text-align: center;
-            font-weight: bold;
-            padding: 5px;
-            margin: 10px 0;
-        }
+/* LEFT LOGO */
+.logo {
+    position: absolute;
+    left: 13px;
+    top: -20px;
+    width: 110px;
+}
 
-        .layout {
-            display: grid;
-            grid-template-columns: 1fr 4fr;
-            gap: 10px;
-        }
+/* TITLE */
+.title h3 {
+    margin: 5px 0;
+    font-size: 20px;
+}
 
-        .door {
-            border: 2px solid black;
-            text-align: center;
-            font-weight: bold;
-            padding: 10px;
-            height: fit-content;
-        }
+.title h4 {
+    margin: 3px 0;
+}
 
-        .benches {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
+/* INFO */
+.info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 10px;
+    font-weight: bold;
+}
 
-        .bench {
-            border: 1px solid black;
-            padding: 6px 10px;
-            height: 35px;
-            font-weight: bold;
-        }
-    </style>
+/* BOARD */
+.board {
+    border: 1px solid black;
+    text-align: center;
+    font-weight: bold;
+
+    padding: 1px 0;     /* 👈 reduce height */
+    margin-bottom: 9px;
+
+    font-size: 14px;    /* optional: slightly smaller */
+}
+/* LAYOUT */
+.layout {
+    display: grid;
+    grid-template-columns: 0.6fr 4.4fr; 
+    gap: 10px;
+}
+
+/* DOOR */
+.door {
+    border: 1px solid black;
+    text-align: center;
+    padding: 50px 10px;
+    font-weight: bold;
+}
+
+/* ROW */
+.row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.bench {
+    border: 1px solid black;
+    padding: 4px;
+    height: 30px;
+    font-weight: bold;
+
+    margin: 3px;   /* 👈 ADD THIS */
+}
+/* HIGHLIGHT */
+.highlight-seat {
+    background-color: #2f6edb;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border: 1px solid black;
+    background-color: white;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background-color: #eee;
+}
+.bench-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.bench-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.seat {
+    width: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.left {
+    justify-content: flex-start;
+}
+
+.right {
+    justify-content: flex-end;
+}
+
+/* PERFECT HIGHLIGHT */
+.highlight-seat {
+    background-color: #2f6edb;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 5px;
+}
+</style>
 </head>
 
 <body>
 
+<div style="width:900px; margin: 20px auto; position: relative;">
+
+    <button onclick="window.location.href='/search.html'" class="back-btn"
+        style="position:absolute; left:0; top:5px;">
+        Back
+    </button>
+
+    <h2 style="text-align:center;">Seating Layout</h2>
+</div>
+
 <div id="allRooms"></div>
 
 <script>
-    let totalRooms = 12;
-    let benchesPerRoom = 18;
-    let studentsPerRoom = 25;
 
-    let usnCounter = 1;
-    let container = document.getElementById("allRooms");
+const rooms = [
+  "Class 1","Class 2","Class 3","Class 4",
+  "Class 5","Class 6","Class 7","Class 8",
+  "Class 9","Class 10","Class 11","Class 12",
+  "Lab 1","Lab 2","Lab 3","Lab 4",
+  "Lab 5","Lab 6","Lab 7","Lab 8"
+];
+let container = document.getElementById("allRooms");
+let selectedUSN = localStorage.getItem("selectedUSN");
 
-    for (let room = 1; room <= totalRooms; room++) {
+async function loadRooms() {
+
+    for (let roomName of rooms) {
+
+        let res = await fetch("http://localhost:8080/seats/layout?room=" + roomName);
+        let data = await res.json();
 
         let roomDiv = document.createElement("div");
         roomDiv.className = "room";
 
         roomDiv.innerHTML = `
-            <div class="center header">
-                NITTE MEENAKSHI INSTITUTE OF TECHNOLOGY (NMIT)<br>
-                DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING<br>
-                SEATING ALLOTMENT MSE1
+        <div class="header">
 
-                <img src="/images/nmit.logo.jpeg" class="logo" alt="NMIT Logo">
+            <img src="/images/nmit.logo.jpeg" class="logo">
+
+            <div class="title">
+                <h3>NITTE MEENAKSHI INSTITUTE OF TECHNOLOGY (NMIT)</h3>
+                <h4>DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING</h4>
+                <h4>SEATING ALLOTMENT MSE1</h4>
             </div>
 
-            <table class="details-table">
-                <tr>
-                    <td>Date: __________</td>
-                    <td>Session: FN / AN</td>
-                    <td>Room No: ${String(room).padStart(3,"0")}</td>
-                </tr>
-                <tr>
-                    <td>Subject: __________</td>
-                    <td>Semester: __________</td>
-                    <td>Academic Year: 2025-2026</td>
-                </tr>
-            </table>
+            <div class="info">
+                <div>Date: ________</div>
+                <div>Session: FN / AN</div>
+                <div>Room No: ${roomName}</div>
+
+                <div>Subject: ________</div>
+                <div>Semester: Mixed</div>
+                <div>Academic Year: 2025-2026</div>
+            </div>
 
             <div class="board">BOARD</div>
+        </div>
 
-            <div class="layout">
-                <div class="door">DOOR</div>
-                <div class="benches"></div>
-            </div>
+        <div class="layout">
+            <div class="door">DOOR</div>
+            <div class="benches"></div>
+        </div>
         `;
 
         let benchesDiv = roomDiv.querySelector(".benches");
-        let studentsPlaced = 0;
 
-        for (let b = 1; b <= benchesPerRoom; b++) {
-            if (studentsPlaced >= studentsPerRoom) break;
+        let maxRow = Math.max(...data.map(s => s.row));
 
-            let bench = document.createElement("div");
-            bench.className = "bench";
+        for (let row = 1; row <= maxRow; row++) {
 
-            let s1 = "";
-            let s2 = "";
+            let rowDiv = document.createElement("div");
+            rowDiv.className = "row";
 
-            if (studentsPlaced < studentsPerRoom) {
-                s1 = "INT22CS" + String(usnCounter++).padStart(3,"0");
-                studentsPlaced++;
+            for (let b = 1; b <= 3; b++) {
+
+                let left = data.find(s => s.row === row && s.col === (b*2-1));
+                let right = data.find(s => s.row === row && s.col === (b*2));
+
+                let leftUSN = left ? left.usn : "";
+                let rightUSN = right ? right.usn : "";
+
+                let bench = document.createElement("div");
+                bench.className = "bench";
+
+   bench.innerHTML = `
+    <div class="bench-row">
+        <div class="seat left">
+            ${leftUSN === selectedUSN 
+                ? `<span class="highlight-seat">${leftUSN}</span>` 
+                : `<span>${leftUSN}</span>`}
+        </div>
+
+        <div class="seat right">
+            ${rightUSN === selectedUSN 
+                ? `<span class="highlight-seat">${rightUSN}</span>` 
+                : `<span>${rightUSN}</span>`}
+        </div>
+    </div>
+`;
+                rowDiv.appendChild(bench);
             }
 
-            if (studentsPlaced < studentsPerRoom) {
-                s2 = "INT22CS" + String(usnCounter++).padStart(3,"0");
-                studentsPlaced++;
-            }
-
-            bench.innerHTML = `
-                <span style="float:left">${s1}</span>
-                <span style="float:right">${s2}</span>
-                <div style="clear:both"></div>
-            `;
-
-            benchesDiv.appendChild(bench);
+            benchesDiv.appendChild(rowDiv);
         }
 
         container.appendChild(roomDiv);
     }
+
+    /* AUTO SCROLL */
+    setTimeout(() => {
+        let seat = document.querySelector(".highlight-seat");
+
+        if (seat) {
+            seat.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+    }, 500);
+}
+
+loadRooms();
+
 </script>
 
 </body>

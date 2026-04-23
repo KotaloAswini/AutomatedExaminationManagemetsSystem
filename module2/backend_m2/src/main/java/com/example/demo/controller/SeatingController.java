@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+/*package com.example.demo.controller;
 
 import com.example.demo.service.SeatingData;
 
@@ -53,7 +53,6 @@ public Map<String, List<String>> generateSeating() {
             for (int i = 0; i < 30 && index < students.size(); i++) {
                 labStudents.add(students.get(index++));
             }
-
             seating.put("Lab " + l, labStudents);
         }
 
@@ -61,4 +60,4 @@ public Map<String, List<String>> generateSeating() {
 
         return seating;
     }
-}  
+}  */
