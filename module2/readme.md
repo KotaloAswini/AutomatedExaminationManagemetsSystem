@@ -1,5 +1,6 @@
 # Automated Examination Seating System
 
+### Developed as part of internship project
 ## 📌 Project Overview
 
 This project is a Full Stack Web Application developed to automate the allocation of examination seating for students. It ensures fair and systematic distribution of students across classrooms and labs.
