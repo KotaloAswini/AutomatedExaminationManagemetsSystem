@@ -52,6 +52,8 @@ This project is a Full Stack Web Application developed to automate the allocatio
 * Ensure backend is connected to database
 
 ---
+## ⚠️ Note
+Ensure backend and database are running before using the application.
 
 ## ▶️ How to Run
 
